@@ -73,6 +73,8 @@ export interface Feature extends Translated {
   src: string | null;
 }
 
+export type StartItem = { id: string; qty: number; category?: undefined } | { category: string; n: number; id?: undefined };
+
 export interface ClassLevel {
   level: number;
   prof: number;
@@ -103,6 +105,8 @@ export interface CharClass {
   multiProfs: string[];
   multiSkill: number;
   startEquip: { id: string; qty: number }[];
+  /** starting equipment picks: options of fixed items or "n items from a category" */
+  startOptions?: { options: StartItem[][] }[];
   subclasses: string[];
   levels: ClassLevel[];
   source?: string;
@@ -265,4 +269,5 @@ export interface RefData {
   proficiencies: Record<string, { name: string; type: string; ref: string | null }>;
   weaponProps: Record<string, { name: string; desc: string[] }>;
   categories: Record<string, string>;
+  categoryItems: Record<string, string[]>;
 }

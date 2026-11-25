@@ -80,7 +80,7 @@ input, select, textarea {
   min-width: 0;
 }
 textarea { min-height: 120px; resize: vertical; }
-input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent); }
+input[type="checkbox"], input[type="radio"] { width: 20px; height: 20px; flex: none; accent-color: var(--accent); }
 label { display: block; font-size: 13px; color: var(--text-2); margin-bottom: 4px; }
 h1, h2, h3 { margin: 0; font-weight: 600; }
 h2 { font-size: 17px; }
@@ -204,6 +204,53 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 12px 0; }
 .breakdown .ln { display: flex; justify-content: space-between; gap: 12px; padding: 2px 0; }
 .breakdown .ln b { color: var(--text); font-weight: 600; }
 .breakdown .sum { border-top: 1px solid var(--border); margin-top: 4px; padding-top: 4px; }
+
+/* avatar */
+.avatar { border-radius: 50%; object-fit: cover; flex: none; display: block; }
+.emblem {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  background: hsl(var(--h) 55% 88%); color: hsl(var(--h) 55% 28%); border: 2px solid hsl(var(--h) 45% 55%);
+}
+.avatar-badge {
+  position: absolute; right: 0; bottom: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--surface); color: var(--text-2); border: 1px solid var(--border);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .emblem { background: hsl(var(--h) 30% 22%); color: hsl(var(--h) 60% 80%); border-color: hsl(var(--h) 40% 45%); }
+}
+
+/* wizard */
+.wiz { display: flex; flex-direction: column; min-height: 100%; }
+.wiz-progress { height: 4px; background: var(--surface-2); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+.wiz-progress > div { height: 100%; background: var(--accent); transition: width 0.25s; }
+.wiz-step-title { font-size: 20px; font-weight: 700; margin: 2px 0 0; }
+.wiz-lead { color: var(--text-2); font-size: 14px; margin: 2px 0 6px; }
+.wiz-footer {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--surface); border-top: 1px solid var(--border);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); display: flex; justify-content: center;
+}
+.wiz-footer .inner { width: 100%; max-width: 760px; display: flex; gap: 8px; align-items: center; }
+.wiz-footer .preview { flex: 1; min-width: 0; font-size: 12px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.choice {
+  display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px;
+}
+.choice.on { border: 2px solid var(--accent); padding: 11px; background: var(--accent-bg); }
+.choice .nm { font-weight: 600; font-size: 15px; min-width: 0; overflow-wrap: anywhere; }
+.choice .tg { font-size: 13px; color: var(--text-2); margin-top: 1px; }
+.choice .chips { margin-top: 6px; gap: 4px; }
+.choice .chips .pill { font-size: 11px; }
+.choice-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex: none; background: hsl(var(--h, 260) 55% 90%); color: hsl(var(--h, 260) 55% 30%); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .choice-icon { background: hsl(var(--h, 260) 30% 24%); color: hsl(var(--h, 260) 60% 80%); }
+}
+.timeline .lvl { display: flex; gap: 10px; padding: 6px 0; border-top: 1px solid var(--border); font-size: 13px; }
+.timeline .lvl b { width: 22px; flex: none; color: var(--text-3); font-weight: 600; }
+.timeline .lvl.sub { background: var(--accent-bg); border-radius: 8px; padding: 6px; color: var(--accent-text); }
+.ability-row { display: grid; grid-template-columns: minmax(0, 1fr) 72px 44px; gap: 8px; align-items: center; padding: 8px 0; border-top: 1px solid var(--border); }
+.ability-row:first-child { border-top: 0; }
+.tip { font-size: 12px; color: var(--text-2); }
+.term { border-bottom: 1px dotted var(--text-3); cursor: help; }
 
 /* dice */
 .dice-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-end; margin: 8px 0 4px; min-height: 56px; }

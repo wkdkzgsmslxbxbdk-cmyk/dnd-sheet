@@ -7,6 +7,8 @@ import { formatMod, parseDice } from "./rules/dice";
 import { Sheet as Modal } from "./ui/common";
 import { rollFree } from "./ui/roll";
 import { DiceRow, prefersReducedMotion } from "./ui/Dice";
+import { Avatar } from "./ui/Avatar";
+import { Wizard } from "./ui/Wizard";
 import { MainTab } from "./ui/tabs/MainTab";
 import { CombatTab } from "./ui/tabs/CombatTab";
 import { MagicTab } from "./ui/tabs/MagicTab";
@@ -76,11 +78,14 @@ function CharacterList() {
           </div>
         )}
         {list.map((ch) => (
-          <button key={ch.id} className="card" style={{ textAlign: "left" }} onClick={() => select(ch.id)}>
-            <b>{ch.name || "Без имени"}</b>
-            <div className="muted" style={{ fontSize: 13 }}>
-              {catalog.races[ch.raceId]?.name} · {classLine(ch)} · ур. {totalLevel(ch)}
-            </div>
+          <button key={ch.id} className="card row" style={{ textAlign: "left", gap: 12 }} onClick={() => select(ch.id)}>
+            <Avatar c={ch} size={48} />
+            <span className="grow" style={{ minWidth: 0 }}>
+              <b>{ch.name || "Без имени"}</b>
+              <div className="muted" style={{ fontSize: 13 }}>
+                {ch.created === false ? "Создание не закончено — продолжить" : `${catalog.races[ch.raceId]?.name} · ${classLine(ch)} · ур. ${totalLevel(ch)}`}
+              </div>
+            </span>
           </button>
         ))}
         <button className="primary" onClick={() => create()}>+ Новый персонаж</button>
@@ -102,19 +107,30 @@ function CharacterList() {
 function CharacterView({ c }: { c: Character }) {
   const [tab, setTab] = useState<Tab>("main");
   const [menu, setMenu] = useState(false);
-  const [edit, setEdit] = useState(c.classes.length === 1 && c.name === "Новый персонаж" && c.updatedAt === c.createdAt);
+  const [edit, setEdit] = useState(false);
   const [diceOpen, setDiceOpen] = useState(false);
   const select = useStore((s) => s.select);
+  const update = useStore((s) => s.update);
   const mode = useStore((s) => s.rollMode);
   const setMode = useStore((s) => s.setRollMode);
   const sheet = useMemo(() => derive(c), [c]);
 
+  if (c.created === false && !edit)
+    return (
+      <Wizard
+        c={c}
+        onDone={() => setTab("main")}
+        onExit={() => select(null)}
+        onAdvanced={() => { update(c.id, (x) => (x.created = true)); setEdit(true); }}
+      />
+    );
   if (edit) return <Editor c={c} onDone={() => setEdit(false)} />;
 
   return (
     <>
       <div className="topbar">
         <button className="ghost small" onClick={() => select(null)} aria-label="К списку">‹</button>
+        <Avatar c={c} size={34} />
         <div className="title">
           <b>{c.name || "Без имени"}</b>
           <span>{catalog.races[c.raceId]?.name} · {classLine(c)}</span>

@@ -971,7 +971,7 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
     else if (info.type === "Weapons") profNames.weapons.push(info.name);
     else if (info.type !== "Skills" && info.type !== "Saving Throws") profNames.tools.push(info.name);
   }
-  const langIds = new Set([...(race?.languages ?? []), ...c.languages]);
+  const langIds = new Set([...(race?.languages ?? []), ...c.languages, ...effectLanguages]);
   profNames.languages = [...langIds].map((l) => cat.ref.languages.find((x) => x.id === l)?.name ?? l);
 
   return {

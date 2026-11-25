@@ -71,6 +71,8 @@ export const useStore = create<State>()(
       createCharacter: () => {
         const c = blankCharacter();
         c.name = "Новый персонаж";
+        c.created = false; // opens the step-by-step wizard
+        c.backgroundId = "soldier"; // the PHB Quick Build background for the default class (fighter)
         set((s) => ({ chars: { ...s.chars, [c.id]: c }, currentId: c.id }));
         return c.id;
       },

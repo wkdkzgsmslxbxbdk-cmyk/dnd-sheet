@@ -9,6 +9,7 @@ test("create a Light cleric from scratch and play a round", async ({ page }) => 
   await page.goto("/");
   await expectNoOverflow(page, "empty list");
   await page.getByRole("button", { name: "+ Новый персонаж" }).click();
+  await page.getByRole("button", { name: /Я знаю правила/ }).click();
 
   // ---- editor ----
   await expect(page.locator(".topbar")).toContainText("Редактор");

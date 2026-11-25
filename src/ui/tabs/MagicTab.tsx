@@ -349,7 +349,7 @@ export function SpellCard({ l, c, sheet, onClose }: { l: ListedSpell; c: Charact
 
 const fmt = (n: number) => (Math.round(n * 10) / 10).toString().replace(".", ",");
 
-function SpellBrowser({ caster, c, onClose }: { caster: SpellcastingInfo; c: Character; onClose: () => void }) {
+export function SpellBrowser({ caster, c, onClose }: { caster: SpellcastingInfo; c: Character; onClose: () => void }) {
   const update = useStore((s) => s.update);
   const [q, setQ] = useState("");
   const [lvl, setLvl] = useState<number | "all">("all");

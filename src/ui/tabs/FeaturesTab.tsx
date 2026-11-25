@@ -6,6 +6,8 @@ import { catalog, skillById } from "../../data/catalog";
 import { CHOICE_KINDS, choiceKey, countAt, type Effect, type EffectOwner } from "../../rules/effects";
 import { useStore } from "../../state/store";
 import { Sheet as Modal, RulesText, srcLabel, UntranslatedBadge } from "../common";
+import { Avatar } from "../Avatar";
+import { LookStep } from "../Wizard";
 
 /** Features whose title is only a pointer ("Path feature", "Ability Score Improvement") are folded */
 const isStub = (f: Feature) => /improvement-\d$|ability-score-improvement/.test(f.id) || /feature$/i.test(f.en);
@@ -36,6 +38,7 @@ export function FeaturesTab({ c, sheet }: { c: Character; sheet: Sheet }) {
 
   return (
     <>
+      <AboutCard c={c} />
       {sheet.toggles.length > 0 && (
         <div className="card">
           <h2>Состояния умений</h2>
@@ -144,6 +147,43 @@ export function FeaturesTab({ c, sheet }: { c: Character; sheet: Sheet }) {
   );
 }
 
+const AP_LABEL: Record<string, string> = { age: "Возраст", height: "Рост", weight: "Вес", eyes: "Глаза", hair: "Волосы", skin: "Кожа" };
+const ST_LABEL: Record<string, string> = { personality: "Черты характера", ideals: "Идеалы", bonds: "Привязанности", flaws: "Слабости", history: "История" };
+
+/** Portrait, appearance and story — editable with the wizard's appearance step */
+function AboutCard({ c }: { c: Character }) {
+  const update = useStore((s) => s.update);
+  const [edit, setEdit] = useState(false);
+  const ap = Object.entries(c.appearance ?? {}).filter(([, v]) => v);
+  const st = Object.entries(c.story ?? {}).filter(([, v]) => v);
+  const align = catalog.ref.alignments.find((a) => a.id === c.alignment)?.name;
+  return (
+    <div className="card">
+      <div className="row" style={{ gap: 12 }}>
+        <Avatar c={c} size={56} />
+        <div className="grow" style={{ minWidth: 0 }}>
+          <h2>{c.name || "Без имени"}</h2>
+          <div className="faint">{[align, ...ap.map(([k, v]) => `${AP_LABEL[k]}: ${v}`)].filter(Boolean).join(" · ") || "Внешность не заполнена"}</div>
+        </div>
+        <button className="small" onClick={() => setEdit(true)}>Изменить</button>
+      </div>
+      {st.length > 0 && (
+        <details style={{ marginTop: 8 }}>
+          <summary className="faint">Характер и история</summary>
+          {st.map(([k, v]) => <p key={k} style={{ margin: "6px 0" }}><b>{ST_LABEL[k]}.</b> {v}</p>)}
+        </details>
+      )}
+      {edit && (
+        <Modal open onClose={() => setEdit(false)} title="О персонаже">
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <LookStep c={c} upd={(f) => update(c.id, f)} />
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
 /** Tasha's optional class features: off by default, the player (and the DM) decides */
 function OptionalFeatures({ classId, c }: { classId: string; c: Character }) {
   const update = useStore((s) => s.update);
@@ -229,7 +269,9 @@ export function EffectChoices({ owner, c, sheet }: { owner: EffectOwner; c: Char
           options = ids.map((id) => ({ id, name: P[id]?.name ?? id }));
         } else if (e.k === "languageChoice") {
           title = "Языки";
-          options = catalog.ref.languages.map((l) => ({ id: l.id, name: l.name }));
+          // languages the character already speaks are not offered again
+          const known = new Set([...(catalog.races[c.raceId]?.languages ?? []), ...c.languages]);
+          options = catalog.ref.languages.filter((l) => !known.has(l.id) || picked.includes(l.id)).map((l) => ({ id: l.id, name: l.name }));
         } else if (e.k === "abilityChoice") {
           title = `Характеристики (+${e.value})`;
           options = (e.from ?? ABILITIES).map((a) => ({ id: a, name: ABILITY_RU[a] }));

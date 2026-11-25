@@ -100,6 +100,13 @@ export interface Character {
 
   notes: string;
   log: RollLogEntry[];
+
+  /** picture chosen by the player (small JPEG data URL); null = class emblem */
+  portrait?: string | null;
+  appearance?: { age?: string; height?: string; weight?: string; eyes?: string; hair?: string; skin?: string };
+  story?: { personality?: string; ideals?: string; bonds?: string; flaws?: string; history?: string };
+  /** finished the creation wizard */
+  created?: boolean;
 }
 
 export function newId(): string {

@@ -12,6 +12,7 @@
     "e2e": "playwright test"
   },
   "dependencies": {
+    "@tabler/icons-react": "^3.53.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "zustand": "^5.1.0"

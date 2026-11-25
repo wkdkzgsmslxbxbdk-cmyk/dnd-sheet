@@ -13,9 +13,10 @@ const SHORT: Record<Ability, string> = { str: "СИЛ", dex: "ЛОВ", con: "Т�
 type Method = "standard" | "pointbuy" | "roll" | "manual";
 
 /** class level at which the subclass is chosen (first level that lists a subclass feature) */
-function subclassLevel(classId: string): number {
-  const sub = catalog.subclasses[catalog.classes[classId]?.subclasses[0]];
-  return sub?.levels[0]?.level ?? 3;
+export function subclassLevel(classId: string): number {
+  const subs = catalog.classes[classId]?.subclasses ?? [];
+  const lv = Math.min(...subs.map((s) => catalog.subclasses[s]?.levels[0]?.level ?? 99));
+  return Number.isFinite(lv) && lv < 99 ? lv : 3;
 }
 
 export function Editor({ c, onDone }: { c: Character; onDone: () => void }) {

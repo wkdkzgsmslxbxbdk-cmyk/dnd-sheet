@@ -258,6 +258,17 @@ const classes = en("Classes").map((c) => {
     multiProfs: (c.multi_classing?.proficiencies ?? []).map((p) => p.index),
     multiSkill: c.multi_classing?.proficiency_choices?.[0]?.choose ?? 0,
     startEquip: (c.starting_equipment ?? []).map((e) => ({ id: e.equipment.index, qty: e.quantity })),
+    // "(a) X or (b) Y" picks: each option is a list of fixed items or "n from a category"
+    startOptions: (c.starting_equipment_options ?? []).map((set) => {
+      const conv = (o) => {
+        if (o.option_type === "counted_reference") return [{ id: o.of.index, qty: o.count }];
+        if (o.option_type === "multiple") return o.items.flatMap(conv);
+        if (o.option_type === "choice") return [{ category: o.choice.from.equipment_category?.index, n: o.choice.choose }];
+        return [];
+      };
+      if (set.from.option_set_type === "equipment_category") return { options: [[{ category: set.from.equipment_category.index, n: set.choose }]] };
+      return { options: set.from.options.map(conv).filter((x) => x.length) };
+    }),
     subclasses: subclassesEn.filter((s) => s.class.index === c.index).map((s) => s.index),
     levels: lv,
   };
@@ -387,6 +398,9 @@ const weaponProps = Object.fromEntries(
 );
 const categories = Object.fromEntries(
   en("Equipment-Categories").map((c) => [c.index, text("equipment", `category:${c.index}`, "name", c.name)]),
+);
+const categoryItems = Object.fromEntries(
+  en("Equipment-Categories").filter((c) => !/wondrous|rod|potion|ring|scroll|staff|wand/.test(c.index)).map((c) => [c.index, (c.equipment ?? []).map((e) => e.index)]),
 );
 const equipment = en("Equipment").map((e) => ({
   id: e.index,
@@ -586,10 +600,26 @@ if (existsSync(BOOKS)) {
 const schools = Object.entries(SCHOOL_RU).map(([id, name]) => ({ id, name }));
 const abilities = Object.entries(ABILITY).map(([id, [short, name]]) => ({ id, short, name }));
 
+// ---- Beginner guide texts (data/guide, see docs/guide-content.md) ----
+const GUIDE_DIR = join(ROOT, "data", "guide");
+const guide = { classes: {}, subclasses: {}, races: {}, backgrounds: {}, glossary: [] };
+if (existsSync(GUIDE_DIR)) {
+  for (const file of readdirSync(GUIDE_DIR)) {
+    const kind = file.replace(/\.(json|md)$/, "").split("-")[0];
+    const text = readFileSync(join(GUIDE_DIR, file), "utf8");
+    if (file === "glossary.md") {
+      for (const m of text.matchAll(/^- \*\*(.+?)\*\* — (.+)$/gm)) guide.glossary.push({ term: m[1], text: m[2].trim() });
+    } else if (file.endsWith(".json") && guide[kind] && !Array.isArray(guide[kind])) {
+      Object.assign(guide[kind], JSON.parse(text));
+    }
+  }
+}
+
 // ---- Write ----
 mkdirSync(OUT, { recursive: true });
+writeFileSync(join(OUT, "guide.json"), JSON.stringify(guide));
 const out = {
-  ref: { abilities, skills, conditions, languages, alignments, damageTypes, schools, proficiencies, weaponProps, categories },
+  ref: { abilities, skills, conditions, languages, alignments, damageTypes, schools, proficiencies, weaponProps, categories, categoryItems },
   spells, features, classes, subclasses, races, subraces, traits, backgrounds, feats, equipment, magicItems,
 };
 for (const [name, data] of Object.entries(out)) {
