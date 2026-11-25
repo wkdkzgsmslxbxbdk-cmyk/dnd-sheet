@@ -118,10 +118,13 @@ function CharacterView({ c }: { c: Character }) {
           <b>{c.name || "Без имени"}</b>
           <span>{catalog.races[c.raceId]?.name} · {classLine(c)}</span>
         </div>
-        <div className="seg" title="Режим следующего броска к20">
-          <button className={mode === "disadvantage" ? "on" : ""} onClick={() => setMode(mode === "disadvantage" ? "normal" : "disadvantage")}>Пом</button>
-          <button className={mode === "advantage" ? "on" : ""} onClick={() => setMode(mode === "advantage" ? "normal" : "advantage")}>Пре</button>
-        </div>
+        <button
+          className={`small mode-btn ${mode}`}
+          title="Следующий бросок к20: обычный → с преимуществом → с помехой"
+          onClick={() => setMode(mode === "normal" ? "advantage" : mode === "advantage" ? "disadvantage" : "normal")}
+        >
+          {mode === "normal" ? "к20 обычно" : mode === "advantage" ? "▲ Преимущество" : "▼ Помеха"}
+        </button>
         <button className="ghost small" onClick={() => setDiceOpen(true)} aria-label="Кубы">🎲</button>
         <button className="ghost small" onClick={() => setMenu(true)} aria-label="Меню">⋮</button>
       </div>
