@@ -263,7 +263,8 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
     base: item.baseId ? cat.equipment[item.baseId] ?? null : item.magicId && ITEM_BASE_WEAPON[item.magicId] ? cat.equipment[ITEM_BASE_WEAPON[item.magicId]] ?? null : null,
     magic: item.magicId ? cat.magicItems[item.magicId] ?? null : null,
   }));
-  const attuned = items.filter((x) => x.item.attuned).length;
+  // only items that require attunement take one of the 3 attunement slots
+  const attuned = items.filter((x) => x.item.attuned && x.magic?.attune).length;
   if (attuned > 3) warnings.push({ level: "warn", text: `Настроено ${attuned} предметов, а можно не больше 3 (правила настройки, Руководство мастера).` });
   const activeMagic = items.filter(({ item, magic }) => magic && item.equipped && (!magic.attune || item.attuned));
   const globalMods: { mod: ItemMod; label: string }[] = [];
@@ -289,6 +290,8 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   [...(race?.profs ?? []), ...(subrace?.profs ?? []), ...traits.flatMap((t) => t.profs), ...(background?.profs ?? [])].forEach((p) => profs.add(p));
   c.skills.forEach((s) => profs.add(`skill-${s}`));
   c.extraProfs.forEach((p) => profs.add(p));
+  // SRD traits with a proficiency choice (dwarf tools): the picks live in choices[traitId]
+  for (const t of traits) if (t.profChoice) for (const p of c.choices[t.id] ?? []) if (t.profChoice.from.includes(p)) profs.add(p);
   // Life Domain "Bonus Proficiency": "you gain proficiency with heavy armor"
   if (has("bonus-proficiency") && subclassOf("cleric") === "life") profs.add("heavy-armor");
   for (const { e } of effs("prof")) e.ids.forEach((p) => profs.add(p));
@@ -528,7 +531,8 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   }
   if (wornArmor?.base?.armor?.str && scores.str.value < wornArmor.base.armor.str) speedParts.push({ label: "Тяжёлый доспех без нужной СИЛ", value: -10 });
   if (c.exhaustion >= 5) speedParts.push({ label: "Истощение 5", value: -(speedParts.reduce((s, p) => s + p.value, 0)) });
-  else if (c.exhaustion >= 2) speedParts.push({ label: "Истощение 2+: скорость вдвое меньше", value: -Math.floor(speedParts.reduce((s, p) => s + p.value, 0) / 2) });
+  // halving rounds down (PHB): 45 ft -> 22 ft, so subtract the larger half
+  else if (c.exhaustion >= 2) speedParts.push({ label: "Истощение 2+: скорость вдвое меньше", value: -Math.ceil(speedParts.reduce((s, p) => s + p.value, 0) / 2) });
   const speed = calc(speedParts);
 
   // ---------- hit points ----------
@@ -928,7 +932,7 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
     }
   }
   for (const t of traits) {
-    if (t.options && !(c.choices[t.id] ?? []).length) warnings.push({ level: "info", text: `Нужно выбрать: ${t.name}.` });
+    if ((t.options || t.profChoice || t.spellOptions) && !(c.choices[t.id] ?? []).length) warnings.push({ level: "info", text: `Нужно выбрать: ${t.name}.` });
   }
   for (const e of c.classes) {
     const cls = cat.classes[e.classId];

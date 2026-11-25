@@ -28,6 +28,7 @@ export function Editor({ c, onDone }: { c: Character; onDone: () => void }) {
   const level = totalLevel(c);
 
   const usedStd = (a: Ability) => ABILITIES.filter((b) => b !== a).map((b) => c.base[b]);
+  const stdOk = [...ABILITIES.map((a) => c.base[a])].sort((x, y) => y - x).join() === STANDARD_ARRAY.join();
   const pointsUsed = ABILITIES.reduce((s, a) => s + (POINT_BUY_COST[c.base[a]] ?? 99), 0);
 
   const rollStats = () => {
@@ -207,7 +208,12 @@ export function Editor({ c, onDone }: { c: Character; onDone: () => void }) {
               </button>
             ))}
           </div>
-          {method === "standard" && <div className="faint" style={{ marginBottom: 6 }}>Распределите 15, 14, 13, 12, 10, 8.</div>}
+          {method === "standard" && (
+            <div className={stdOk ? "faint" : "info-box"} style={{ marginBottom: 6 }}>
+              Распределите 15, 14, 13, 12, 10, 8. Если значение уже занято (⇄), характеристики поменяются местами.
+              {!stdOk && <button className="small" style={{ marginLeft: 8 }} onClick={() => upd((x) => ABILITIES.forEach((b, i) => (x.base[b] = STANDARD_ARRAY[i])))}>Заполнить по порядку</button>}
+            </div>
+          )}
           {method === "pointbuy" && (
             <div className={pointsUsed > POINT_BUY_BUDGET ? "bad-box" : "faint"} style={{ marginBottom: 6 }}>
               Очки: {pointsUsed}/{POINT_BUY_BUDGET}. Значения от 8 до 15, 14 и 15 стоят дороже.
@@ -231,9 +237,20 @@ export function Editor({ c, onDone }: { c: Character; onDone: () => void }) {
                 <div className="li" key={a}>
                   <span style={{ width: 110 }}>{FULL[a]}</span>
                   {method === "standard" ? (
-                    <select value={c.base[a]} onChange={(e) => upd((x) => (x.base[a] = Number(e.target.value)))} style={{ width: 80 }}>
+                    <select
+                      value={c.base[a]}
+                      aria-label={FULL[a]}
+                      onChange={(e) => upd((x) => {
+                        // picking a value another ability holds swaps the two
+                        const v = Number(e.target.value);
+                        const other = ABILITIES.find((b) => b !== a && x.base[b] === v);
+                        if (other) x.base[other] = x.base[a];
+                        x.base[a] = v;
+                      })}
+                      style={{ width: 80 }}
+                    >
                       {[...new Set([c.base[a], ...STANDARD_ARRAY])].map((v) => (
-                        <option key={v} value={v} disabled={usedStd(a).includes(v) && STANDARD_ARRAY.filter((s) => s === v).length <= usedStd(a).filter((s) => s === v).length}>{v}</option>
+                        <option key={v} value={v}>{v}{usedStd(a).includes(v) && v !== c.base[a] ? " ⇄" : ""}</option>
                       ))}
                     </select>
                   ) : method === "pointbuy" ? (

@@ -81,6 +81,8 @@ export function MagicTab({ c, sheet }: { c: Character; sheet: Sheet }) {
       <Hint id="magic">Нажмите на заклинание: урон, лечение, Сл и атака уже посчитаны от ваших характеристик. Выберите ячейку, и числа пересчитаются.</Hint>
 
       {sheet.casting.map((k) => {
+        // a race/feat caster with nothing granted yet (high-elf cantrip not picked) is just noise
+        if (isGranted(k.classId) && !listed.some((l) => l.classId === k.classId)) return null;
         const mine = listed.filter((l) => l.classId === k.classId && !l.always);
         const cantrips = mine.filter((l) => l.spell.level === 0).length;
         const leveled = mine.filter((l) => l.spell.level > 0);
@@ -115,6 +117,13 @@ export function MagicTab({ c, sheet }: { c: Character; sheet: Sheet }) {
           </div>
         );
       })}
+
+      {c.concentration && catalog.spells[c.concentration] && (
+        <div className="info-box row">
+          <span className="grow">Концентрация: <b>{catalog.spells[c.concentration].name}</b></span>
+          <button className="small" onClick={() => upd((x) => (x.concentration = null))}>Прервать</button>
+        </div>
+      )}
 
       {(sheet.slots.some((n) => n > 0) || sheet.pact) && (
         <div className="card">
@@ -175,7 +184,8 @@ export function MagicTab({ c, sheet }: { c: Character; sheet: Sheet }) {
                   )}
                   <span className="grow">
                     <b style={{ opacity: l.prepared || l.spell.level === 0 ? 1 : 0.55 }}>{l.spell.name}</b>{" "}
-                    {l.spell.conc && <span className="pill">К</span>} {l.spell.ritual && <span className="pill">Р</span>}
+                    {l.spell.conc && (c.concentration === l.spell.id ? <span className="pill accent">концентрация</span> : <span className="pill" title="Концентрация">К</span>)}{" "}
+                    {l.spell.ritual && <span className="pill" title="Ритуал">Р</span>}
                     <div className="faint">
                       {l.spell.cast} · {l.spell.range}
                       {r.save && ` · спас ${abilityShort(r.save.ability)} Сл ${r.save.dc.value}`}

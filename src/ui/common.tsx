@@ -178,13 +178,15 @@ export function Hint({ id, children }: { id: string; children: ReactNode }) {
   );
 }
 
-export function Counter({ value, min = 0, max, onChange }: { value: number; min?: number; max?: number; onChange: (v: number) => void }) {
+export function Counter({ value, min = 0, max, suffix, onChange }: { value: number; min?: number; max?: number; suffix?: string; onChange: (v: number) => void }) {
   const clamp = (v: number) => Math.max(min, max != null ? Math.min(max, v) : v);
   return (
     <div className="row" style={{ gap: 4 }}>
-      <button className="small" onClick={() => onChange(clamp(value - 1))}>−</button>
-      <span style={{ minWidth: 28, textAlign: "center", fontWeight: 600 }}>{value}</span>
-      <button className="small" onClick={() => onChange(clamp(value + 1))}>+</button>
+      <button className="small" aria-label="Меньше" disabled={value <= min} onClick={() => onChange(clamp(value - 1))}>−</button>
+      <span style={{ minWidth: 28, textAlign: "center", fontWeight: 600, whiteSpace: "nowrap" }}>
+        {value}{suffix && <span className="faint">{suffix}</span>}
+      </span>
+      <button className="small" aria-label="Больше" disabled={max != null && value >= max} onClick={() => onChange(clamp(value + 1))}>+</button>
     </div>
   );
 }

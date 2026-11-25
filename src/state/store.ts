@@ -8,10 +8,20 @@ export interface RollPart {
   value: number | string;
 }
 
+export interface DieFace {
+  d: number;
+  v: number;
+  /** the lower/higher d20 that advantage/disadvantage discards */
+  dropped?: boolean;
+  negative?: boolean;
+}
+
 export interface RollResult {
   id: string;
   at: number;
   label: string;
+  /** individual dice for the animation */
+  faces?: DieFace[];
   /** "к20: 14", "2к6: 3, 5" */
   dice: string;
   parts: RollPart[];
@@ -30,6 +40,9 @@ interface State {
   lastRoll: RollResult | null;
   history: RollResult[];
   seenHints: Record<string, boolean>;
+  /** dice animation on/off (also skipped when the OS asks for reduced motion) */
+  animateDice: boolean;
+  setAnimateDice: (v: boolean) => void;
 
   createCharacter: () => string;
   select: (id: string | null) => void;
@@ -52,6 +65,8 @@ export const useStore = create<State>()(
       lastRoll: null,
       history: [],
       seenHints: {},
+      animateDice: true,
+      setAnimateDice: (animateDice) => set({ animateDice }),
 
       createCharacter: () => {
         const c = blankCharacter();
@@ -102,6 +117,7 @@ export const useStore = create<State>()(
         chars: s.chars,
         currentId: s.currentId,
         seenHints: s.seenHints,
+        animateDice: s.animateDice,
         history: s.history.map(({ followUp: _f, ...rest }) => rest),
       }),
     },

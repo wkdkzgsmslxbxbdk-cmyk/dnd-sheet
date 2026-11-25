@@ -20,8 +20,11 @@ export function rollCheck(
   const mode = st.rollMode;
   const r = rollD20(bonus.value, mode, { critFrom: opts.critFrom });
   const parts: RollPart[] = [{ label: mode === "normal" ? "к20" : `к20 (${MODE_RU[mode]}: ${r.rolls.join(" и ")})`, value: r.kept }, ...bonus.parts];
+  // with advantage/disadvantage the other die is shown dropped
+  const keptIdx = r.rolls.indexOf(r.kept);
   st.pushRoll({
     label,
+    faces: r.rolls.map((v, i) => ({ d: 20, v, dropped: r.rolls.length > 1 && i !== keptIdx })),
     dice: `к20: ${r.rolls.join(", ")}${mode !== "normal" ? ` → ${r.kept}` : ""}`,
     parts,
     total: r.total,
@@ -39,6 +42,7 @@ export function rollDamage(label: string, expr: DiceExpr, opts: { crit?: boolean
   if (r.flat) parts.push({ label: opts.partsText?.slice(1).join(" ") || "Модификаторы", value: r.flat });
   useStore.getState().pushRoll({
     label,
+    faces: r.terms.flatMap((t) => t.rolls.map((v) => ({ d: t.d, v, negative: t.sign < 0 }))),
     dice: exprDiceText(r) || formatDice(expr),
     parts,
     total: r.total,

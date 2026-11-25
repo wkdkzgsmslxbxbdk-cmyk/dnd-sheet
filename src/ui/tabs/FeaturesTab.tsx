@@ -77,7 +77,7 @@ export function FeaturesTab({ c, sheet }: { c: Character; sheet: Sheet }) {
         <h2>Раса: {race?.name}{c.subraceId ? `, ${catalog.subraces[c.subraceId]?.name}` : ""}</h2>
         <div className="list">
           {sheet.traits.filter((t) => !t.parent).map((t) => {
-            const needs = Boolean(t.options || t.spellOptions);
+            const needs = Boolean(t.options || t.spellOptions || t.profChoice);
             const picked = c.choices[t.id] ?? [];
             const pending = (needs && !picked.length ? 1 : 0) + pendingChoices(t, c);
             return (
@@ -349,6 +349,18 @@ function TraitSheet({ id, c, sheet, onClose, setChoice }: { id: string; c: Chara
     <Modal open onClose={onClose} title={t.name}>
       <RulesText paras={t.desc} />
       <EffectChoices owner={{ id: t.id, name: t.name, effects: t.effects ?? [] }} c={c} sheet={sheet} />
+      {t.profChoice && (
+        <div style={{ margin: "8px 0" }}>
+          <div className="row"><b className="grow">Владение на выбор</b><span className={`pill ${picked.length === t.profChoice.n ? "good" : "warn"}`}>{picked.length}/{t.profChoice.n}</span></div>
+          <div className="chips" style={{ marginTop: 4 }}>
+            {t.profChoice.from.map((p) => (
+              <span key={p} className={`chip${picked.includes(p) ? " on" : ""}`} onClick={() => setChoice(id, picked.includes(p) ? picked.filter((x) => x !== p) : [...picked, p].slice(-t.profChoice!.n))}>
+                {catalog.ref.proficiencies[p]?.name ?? p}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
       {options.length > 0 && (
         <>
           <h3 style={{ margin: "10px 0 6px" }}>Выберите один вариант</h3>

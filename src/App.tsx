@@ -6,6 +6,7 @@ import { totalLevel, type Character } from "./rules/character";
 import { formatMod, parseDice } from "./rules/dice";
 import { Sheet as Modal } from "./ui/common";
 import { rollFree } from "./ui/roll";
+import { DiceRow, prefersReducedMotion } from "./ui/Dice";
 import { MainTab } from "./ui/tabs/MainTab";
 import { CombatTab } from "./ui/tabs/CombatTab";
 import { MagicTab } from "./ui/tabs/MagicTab";
@@ -187,6 +188,8 @@ function DiceTray({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [expr, setExpr] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const history = useStore((s) => s.history);
+  const animateDice = useStore((s) => s.animateDice);
+  const setAnimateDice = useStore((s) => s.setAnimateDice);
   const roll = (s: string) => {
     try {
       rollFree(parseDice(s));
@@ -208,6 +211,9 @@ function DiceTray({ open, onClose }: { open: boolean; onClose: () => void }) {
         <button className="primary" onClick={() => roll(expr)}>Бросить</button>
       </div>
       {err && <div className="bad-box" style={{ marginTop: 8 }}>{err}</div>}
+      <label className="row" style={{ marginTop: 10 }}>
+        <input type="checkbox" checked={animateDice} onChange={(e) => setAnimateDice(e.target.checked)} /> Анимация бросков
+      </label>
       <h3 style={{ margin: "14px 0 6px" }}>История</h3>
       <div className="list">
         {history.length === 0 && <div className="faint">Пока пусто</div>}
@@ -228,19 +234,27 @@ function DiceTray({ open, onClose }: { open: boolean; onClose: () => void }) {
 function RollToast() {
   const r = useStore((s) => s.lastRoll);
   const clear = useStore((s) => s.clearRoll);
+  const animateDice = useStore((s) => s.animateDice);
+  const [landedId, setLandedId] = useState<string | null>(null);
   if (!r) return null;
+  const animate = animateDice && !prefersReducedMotion() && Boolean(r.faces?.length);
+  const landed = !animate || landedId === r.id;
+  const isDamage = /урон|лечение|хиты/i.test(r.label);
   return (
     <div className="roll" onClick={clear}>
-      <div className="box" onClick={(e) => e.stopPropagation()}>
+      <div className="box" onClick={(e) => e.stopPropagation()} role="status" aria-live="polite">
         <div className="row">
           <div className="grow">
             <b>{r.label}</b>
             <div className="faint">{r.dice}</div>
           </div>
-          <div className={`total${r.crit ? " crit" : r.fumble ? " fumble" : ""}`}>{r.total}</div>
+          <div className={`total${r.crit ? " crit" : r.fumble ? " fumble" : ""}${landed ? "" : " counting"}`}>{landed ? r.total : "…"}</div>
         </div>
-        {r.crit && <div className="pill good" style={{ marginTop: 4 }}>{r.label.includes("урон") || r.label.includes("Урон") ? "Критический урон" : "Критическое попадание!"}</div>}
-        {r.fumble && <div className="pill bad" style={{ marginTop: 4 }}>Естественная 1</div>}
+        {r.faces?.length ? (
+          <DiceRow key={r.id} faces={r.faces} animate={animate} crit={r.crit && !isDamage} fumble={r.fumble} onLanded={() => setLandedId(r.id)} />
+        ) : null}
+        {landed && r.crit && <div className="pill good" style={{ marginTop: 4 }}>{isDamage ? "Критический урон: кубы удвоены" : "Критическое попадание!"}</div>}
+        {landed && r.fumble && <div className="pill bad" style={{ marginTop: 4 }}>Естественная 1</div>}
         <div className="breakdown" style={{ marginTop: 6 }}>
           {r.parts.map((p, i) => (
             <div className="ln" key={i}>
@@ -251,7 +265,7 @@ function RollToast() {
         </div>
         {r.note && <div className="faint" style={{ marginTop: 4 }}>{r.note}</div>}
         <div className="row" style={{ marginTop: 8, justifyContent: "flex-end" }}>
-          {r.followUp && (
+          {r.followUp && landed && (
             <button className="primary small" onClick={() => r.followUp!.run(Boolean(r.crit))}>
               {r.followUp.label}{r.crit ? " (крит)" : ""}
             </button>

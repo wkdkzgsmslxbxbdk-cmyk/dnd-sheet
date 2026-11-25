@@ -6,6 +6,7 @@ import { formatMod } from "../../rules/dice";
 import { Hint, Sheet as Modal, RulesText, useExplain, usePress } from "../common";
 import { rollCheck } from "../roll";
 import { useState } from "react";
+import { useStore } from "../../state/store";
 
 const FULL: Record<Ability, string> = { str: "Сила", dex: "Ловкость", con: "Телосложение", int: "Интеллект", wis: "Мудрость", cha: "Харизма" };
 
@@ -36,6 +37,8 @@ function RowRoll({ dot, label, value, sub, onTap, onLong }: { dot: string; label
 export function MainTab({ c, sheet }: { c: Character; sheet: Sheet }) {
   const { setExplain, node } = useExplain();
   const [skillInfo, setSkillInfo] = useState<string | null>(null);
+  // one hint at a time: the roll-mode hint waits until the first one is dismissed
+  const seenTap = useStore((s) => s.seenHints["tap-roll"]);
   const casting = sheet.casting[0];
   const tiles: { label: string; calc: Calc; signed?: boolean; roll?: () => void; note?: string }[] = [
     { label: "КД", calc: sheet.ac, note: sheet.acNote ?? undefined },
@@ -48,15 +51,22 @@ export function MainTab({ c, sheet }: { c: Character; sheet: Sheet }) {
   return (
     <>
       <Hint id="tap-roll">Нажмите на характеристику, спасбросок или навык, чтобы бросить к20 со всеми бонусами. Долгое нажатие покажет, из чего сложилось число.</Hint>
-      <Hint id="roll-mode">Кнопка «к20 обычно» вверху переключает следующий бросок: с преимуществом (два к20, берётся больший) или с помехой (берётся меньший). После броска режим сам сбрасывается.</Hint>
+      {seenTap && <Hint id="roll-mode">Кнопка «к20 обычно» вверху переключает следующий бросок: с преимуществом (два к20, берётся больший) или с помехой (берётся меньший). После броска режим сам сбрасывается.</Hint>}
 
-      {sheet.warnings.length > 0 && (
-        <div className="list">
-          {sheet.warnings.map((w, i) => (
-            <div key={i} className={w.level === "warn" ? "warn-box" : "info-box"} style={{ marginBottom: 6 }}>{w.text}</div>
-          ))}
-        </div>
-      )}
+      {sheet.warnings.filter((w) => w.level === "warn").map((w, i) => (
+        <div key={i} className="warn-box">{w.text}</div>
+      ))}
+      {(() => {
+        const todo = sheet.warnings.filter((w) => w.level === "info");
+        if (!todo.length) return null;
+        return (
+          <details className="info-box todo">
+            <summary>Нужно доделать: {todo.length}</summary>
+            <ul>{todo.map((w, i) => <li key={i}>{w.text}</li>)}</ul>
+            <div className="faint">Выборы умений — на вкладке «Умения», уровень и характеристики — в меню ⋮ → Редактировать.</div>
+          </details>
+        );
+      })()}
 
       <div className="grid4">
         {tiles.map((t) => (
@@ -137,10 +147,23 @@ export function MainTab({ c, sheet }: { c: Character; sheet: Sheet }) {
 
       <div className="card">
         <h2>Пассивные значения</h2>
-        <div className="grid3">
-          <StatTile label="Внимательность" value={String(sheet.passive.perception.value)} onTap={() => setExplain({ title: "Пассивная Внимательность", calc: sheet.passive.perception })} onLong={() => setExplain({ title: "Пассивная Внимательность", calc: sheet.passive.perception })} />
-          <StatTile label="Проницательность" value={String(sheet.passive.insight.value)} onTap={() => setExplain({ title: "Пассивная Проницательность", calc: sheet.passive.insight })} onLong={() => setExplain({ title: "Пассивная Проницательность", calc: sheet.passive.insight })} />
-          <StatTile label="Анализ" value={String(sheet.passive.investigation.value)} onTap={() => setExplain({ title: "Пассивный Анализ", calc: sheet.passive.investigation })} onLong={() => setExplain({ title: "Пассивный Анализ", calc: sheet.passive.investigation })} />
+        <div className="list">
+          {([
+            ["Внимательность", sheet.passive.perception],
+            ["Проницательность", sheet.passive.insight],
+            ["Анализ", sheet.passive.investigation],
+          ] as const).map(([name, calc]) => (
+            <div className="li tap" key={name} onClick={() => setExplain({ title: `Пассивная ${name}`, calc })}>
+              <span className="grow">{name}</span>
+              <span className="val">{calc.value}</span>
+            </div>
+          ))}
+          {sheet.senses.length > 0 && (
+            <div className="li">
+              <span className="grow">Чувства</span>
+              <span className="faint">{sheet.senses.map((s) => `${s.name} ${s.range} фт`).join(", ")}</span>
+            </div>
+          )}
         </div>
         <div className="faint" style={{ marginTop: 6 }}>10 + бонус проверки. Мастер сравнивает с ним Сл, когда вы не бросаете кубы.</div>
       </div>

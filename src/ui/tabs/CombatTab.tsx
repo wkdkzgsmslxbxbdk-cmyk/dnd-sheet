@@ -16,7 +16,8 @@ export function CombatTab({ c, sheet }: { c: Character; sheet: Sheet }) {
   const [rest, setRest] = useState<null | "short" | "long">(null);
   const [condInfo, setCondInfo] = useState<string | null>(null);
   const max = sheet.hpMax.value;
-  const cur = c.hp.current;
+  // max can drop (level down, exhaustion 4): never show more current than maximum
+  const cur = Math.min(c.hp.current, max);
   const n = Number(amount) || 0;
 
   const damage = () => {
@@ -26,8 +27,8 @@ export function CombatTab({ c, sheet }: { c: Character; sheet: Sheet }) {
       const fromTemp = Math.min(x.hp.temp, left);
       x.hp.temp -= fromTemp;
       left -= fromTemp;
-      const before = x.hp.current;
-      x.hp.current = Math.max(0, x.hp.current - left);
+      const before = Math.min(x.hp.current, max);
+      x.hp.current = Math.max(0, before - left);
       // PHB: massive damage — remaining damage >= max HP means instant death
       if (before - left <= -max) x.deathSaves.fail = 3;
       if (x.concentration && n > 0) {
@@ -67,6 +68,7 @@ export function CombatTab({ c, sheet }: { c: Character; sheet: Sheet }) {
     });
     pushRoll({
       label: "Спасбросок от смерти",
+      faces: [{ d: 20, v: r }],
       dice: `к20: ${r}`,
       parts: [{ label: "к20", value: r }],
       total: r,
@@ -104,11 +106,11 @@ export function CombatTab({ c, sheet }: { c: Character; sheet: Sheet }) {
           <button className="small" onClick={() => upd((x) => (x.hp.current = max))}>Полностью</button>
         </div>
         <div className="hp-bar" style={{ margin: "6px 0 10px" }}><div className={pct < 34 ? "low" : ""} style={{ width: `${pct}%` }} /></div>
-        <div className="row">
-          <input inputMode="numeric" placeholder="Число" value={amount} onChange={(e) => setAmount(e.target.value.replace(/\D/g, ""))} style={{ width: 90, flex: "none" }} />
-          <button className="danger grow" onClick={damage}>Урон</button>
-          <button className="grow" onClick={heal}>Лечение</button>
-          <button className="grow" onClick={temp}>Временные</button>
+        <div className="hp-controls">
+          <input inputMode="numeric" placeholder="Число" aria-label="Сколько хитов" value={amount} onChange={(e) => setAmount(e.target.value.replace(/\D/g, ""))} onKeyDown={(e) => e.key === "Enter" && damage()} />
+          <button className="danger" onClick={damage}>Урон</button>
+          <button onClick={heal}>Лечение</button>
+          <button onClick={temp} title="Временные хиты">Врем.</button>
         </div>
         {c.concentration && (
           <div className="info-box row" style={{ marginTop: 8 }}>
@@ -119,13 +121,16 @@ export function CombatTab({ c, sheet }: { c: Character; sheet: Sheet }) {
         {down && (
           <div style={{ marginTop: 10 }}>
             <div className="bad-box">При 0 хитов вы без сознания. В начале хода совершайте спасбросок от смерти: 10+ успех, 3 успеха — стабилизация, 3 провала — смерть.</div>
-            <div className="row" style={{ marginTop: 8 }}>
-              <span>Успехи</span>
-              {[0, 1, 2].map((i) => <span key={i} className={`dot ${c.deathSaves.ok > i ? "on" : ""}`} />)}
-              <span style={{ marginLeft: 12 }}>Провалы</span>
-              {[0, 1, 2].map((i) => <span key={i} className="dot" style={c.deathSaves.fail > i ? { background: "var(--bad)", borderColor: "var(--bad)" } : undefined} />)}
-              <span className="grow" />
-              <button className="primary small" onClick={deathSave}>Бросить</button>
+            <div className="death-saves">
+              <div className="row">
+                <span className="ds-label">Успехи</span>
+                {[0, 1, 2].map((i) => <span key={i} className={`dot big ${c.deathSaves.ok > i ? "on" : ""}`} />)}
+              </div>
+              <div className="row">
+                <span className="ds-label">Провалы</span>
+                {[0, 1, 2].map((i) => <span key={i} className={`dot big ${c.deathSaves.fail > i ? "fail" : ""}`} />)}
+              </div>
+              <button className="primary" onClick={deathSave}>Спасбросок от смерти</button>
             </div>
             {c.deathSaves.fail >= 3 && <div className="bad-box" style={{ marginTop: 6 }}>Три провала — персонаж погиб.</div>}
             {c.deathSaves.ok >= 3 && <div className="info-box" style={{ marginTop: 6 }}>Три успеха — персонаж стабилизирован.</div>}
@@ -198,10 +203,7 @@ export function CombatTab({ c, sheet }: { c: Character; sheet: Sheet }) {
                 {r.unlimited ? (
                   <span className="pill good">без ограничений</span>
                 ) : (
-                  <>
-                    <span className="faint">{r.max - r.used}/{r.max}</span>
-                    <Counter value={r.max - r.used} max={r.max} onChange={(v) => upd((x) => (x.used[r.id] = r.max - v))} />
-                  </>
+                  <Counter value={r.max - r.used} max={r.max} suffix={`/${r.max}`} onChange={(v) => upd((x) => (x.used[r.id] = r.max - v))} />
                 )}
               </div>
             ))}

@@ -207,14 +207,20 @@ function AddItem({ c, onClose }: { c: Character; onClose: () => void }) {
     window.setTimeout(() => setAdded(null), 1500);
   };
   const match = (s: { name: string; en: string }) => !q || s.name.toLowerCase().includes(q.toLowerCase()) || s.en.toLowerCase().includes(q.toLowerCase());
+  // exact name first, then names starting with the query, then the rest
+  const rank = (s: { name: string }) => {
+    const n = s.name.toLowerCase(), t = q.trim().toLowerCase();
+    return !t ? 0 : n === t ? 0 : n.startsWith(t) ? 1 : 2;
+  };
 
   const gearCats = ["all", "weapon", "armor", "adventuring-gear", "tools", "mounts-and-vehicles"];
-  const gear = catalog.equipmentList.filter((e) => (cat === "all" || e.cat === cat) && match(e)).sort((a, b) => a.name.localeCompare(b.name, "ru"));
+  const gear = catalog.equipmentList.filter((e) => (cat === "all" || e.cat === cat) && match(e)).sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name, "ru"));
   const magic = catalog.magicItemList
     .filter((m) => !m.variants.length) // pick concrete variants, not the umbrella entry
-    .filter((m) => (rarity === "fit" ? m.minLevel <= level && m.rarity !== "Artifact" : rarity === "all" || m.rarity === rarity))
+    // while searching by name the level filter doesn't hide anything (items above the level get a mark)
+    .filter((m) => (rarity === "fit" ? (q.trim() ? true : m.minLevel <= level && m.rarity !== "Artifact") : rarity === "all" || m.rarity === rarity))
     .filter(match)
-    .sort((a, b) => RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity) || a.name.localeCompare(b.name, "ru"));
+    .sort((a, b) => rank(a) - rank(b) || RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity) || a.name.localeCompare(b.name, "ru"));
 
   const baseOptions = (m: MagicItem) => {
     const kind = ITEM_EFFECTS[m.id]?.base ?? (m.cat === "armor" ? "armor" : m.cat === "weapon" ? "weapon" : m.cat === "ammunition" ? "ammunition" : null);
@@ -279,6 +285,7 @@ function AddItem({ c, onClose }: { c: Character; onClose: () => void }) {
             <div className="li tap" key={m.id} onClick={() => (baseOptions(m) ? setPickBase(m) : add(null, m.id, m.name))}>
               <span className="grow">
                 {m.name} {ITEM_EFFECTS[m.id] && <span className="pill good">авторасчёт</span>}
+                {m.minLevel > level && <span className="pill warn">обычно с {m.minLevel} ур.</span>}
                 <div className="faint">{m.rarityName}{m.attune ? " · настройка" : ""}</div>
               </span>
               <span className="faint">+</span>
