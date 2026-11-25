@@ -75,6 +75,41 @@
   ```
   `slots` — количество ячеек 1, 2, 3... уровней. Ограничения по школам опиши текстом в умении.
 
+### Класс целиком (изобретатель)
+
+Файл `data/books/<книга>/class-<id>.json`:
+
+```json
+{ "classes": [{
+  "id": "artificer", "name": "Изобретатель", "en": "Artificer", "page": 9, "hitDie": 8,
+  "saves": ["con", "int"],
+  "profs": ["light-armor", "medium-armor", "shields", "simple-weapons", "thieves-tools", "tinkers-tools"],
+  "skillChoice": {"n": 2, "from": ["arcana", "history", "..."]},
+  "multiclass": [{"ability": "int", "min": 13}], "multiProfs": ["light-armor", "..."], "multiSkill": 0,
+  "casting": {"ability": "int", "level": 1, "progression": "halfUp", "prepared": "half"},
+  "desc": ["кратко своими словами"],
+  "levels": [
+    {"level": 1, "prof": 2, "features": ["artificer-magical-tinkering", "artificer-spellcasting"],
+     "spell": {"cantrips": 2, "slots": [2]}, "cs": {"infusions_known": 0, "infused_items": 0}},
+    "... все 20 уровней ..."
+  ],
+  "features": [ {"id": "artificer-magical-tinkering", "level": 1, "name": "...", "en": "...", "page": 10, "desc": ["..."], "effects": []} ]
+}]}
+```
+
+- `levels` — все 20 уровней таблицы класса из книги; `features` в уровне — id умений этого уровня (включая
+  «Увеличение характеристик»: используй общий id `ability-score-improvement-<класс>-<уровень>` и опиши в `features`).
+- `spell.slots` — ячейки 1, 2, 3... уровней по таблице; `cantrips` — известные заговоры.
+- `casting.progression`: `full` / `half` (паладин) / `halfUp` (половина с округлением вверх); `prepared`:
+  `level` / `half` / `halfUp` / null — сколько заклинаний готовится (модификатор + уровень или половина уровня).
+- Классовые счётчики — в `cs`; ресурсы умений — эффектом `resource`.
+- Подклассы класса — обычные `subclasses` с `"class": "<id класса>"` (можно в том же файле).
+- Выбор вариантов (инфузии) — умение с `choice` (`n` по уровням класса) и варианты-умения с `addTo`.
+
+### Необязательные умения класса (Таша)
+
+Обычное умение в `features` с `class`, `level` и `"optional": true` — игрок включает его сам.
+
 ### Умения-опции (приёмы, воззвания, боевые стили, метамагия)
 
 ```json

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Character } from "../../rules/character";
-import type { Sheet } from "../../rules/derive";
+import { optionalKey, type Sheet } from "../../rules/derive";
 import { ABILITIES, type Feature } from "../../rules/types";
 import { catalog, skillById } from "../../data/catalog";
 import { CHOICE_KINDS, choiceKey, countAt, type Effect, type EffectOwner } from "../../rules/effects";
@@ -27,8 +27,7 @@ export function FeaturesTab({ c, sheet }: { c: Character; sheet: Sheet }) {
   const [featOpen, setFeatOpen] = useState<string | null>(null);
   const setChoice = (id: string, values: string[]) => update(c.id, (x) => (x.choices[id] = values));
 
-  const optionIds = new Set(sheet.features.flatMap((f) => c.choices[f.feature.id] ?? []));
-  const visible = sheet.features.filter((f) => !optionIds.has(f.feature.id) && !isStub(f.feature));
+  const optionIds = new Set(sheet.features.flatMap((f) => c.choices[f.feature.id] ?? []));  const visible = sheet.features.filter((f) => !optionIds.has(f.feature.id) && !isStub(f.feature));
   const byClass = new Map<string, typeof visible>();
   for (const f of visible) byClass.set(f.classId, [...(byClass.get(f.classId) ?? []), f]);
 
@@ -70,6 +69,7 @@ export function FeaturesTab({ c, sheet }: { c: Character; sheet: Sheet }) {
               );
             })}
           </div>
+          <OptionalFeatures classId={classId} c={c} />
         </div>
       ))}
 
@@ -141,6 +141,48 @@ export function FeaturesTab({ c, sheet }: { c: Character; sheet: Sheet }) {
         </Modal>
       )}
     </>
+  );
+}
+
+/** Tasha's optional class features: off by default, the player (and the DM) decides */
+function OptionalFeatures({ classId, c }: { classId: string; c: Character }) {
+  const update = useStore((s) => s.update);
+  const [info, setInfo] = useState<Feature | null>(null);
+  const list = Object.values(catalog.features).filter((f) => f.optional && f.class === classId).sort((a, b) => a.level - b.level);
+  if (!list.length) return null;
+  const key = optionalKey(classId);
+  const on = new Set(c.choices[key] ?? []);
+  const cl = clevelOf(c, classId);
+  return (
+    <details style={{ marginTop: 8 }}>
+      <summary className="faint">Необязательные умения класса ({list.filter((f) => on.has(f.id)).length} включено)</summary>
+      <div className="faint" style={{ margin: "4px 0" }}>Из «Котла Таши». Включайте с согласия Мастера; некоторые заменяют обычные умения.</div>
+      <div className="list">
+        {list.map((f) => (
+          <div className="li" key={f.id}>
+            <input
+              type="checkbox"
+              checked={on.has(f.id)}
+              onChange={() => update(c.id, (x) => {
+                const cur = new Set(x.choices[key] ?? []);
+                if (cur.has(f.id)) cur.delete(f.id);
+                else cur.add(f.id);
+                x.choices[key] = [...cur];
+              })}
+            />
+            <span className="grow tap" onClick={() => setInfo(f)} style={{ opacity: f.level > cl ? 0.5 : 1 }}>
+              {f.name} <span className="faint">{f.level} ур.{f.level > cl ? " — ещё не доступно" : ""}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+      {info && (
+        <Modal open onClose={() => setInfo(null)} title={info.name}>
+          <RulesText paras={info.desc} />
+          <div className="faint">{srcLabel(info.src)}</div>
+        </Modal>
+      )}
+    </details>
   );
 }
 

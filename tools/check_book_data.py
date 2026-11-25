@@ -265,6 +265,10 @@ def main():
             elif i in ids[kind] and ids[kind][i] != rel:
                 rep.err(rel, f"{kind} id {i!r} duplicates {ids[kind][i]}")
             ids[kind][i] = rel
+        for k in data.get("classes", []):
+            CLASSES.add(k.get("id"))
+            for ft in k.get("features", []):
+                reg("features", ft)
         for s in data.get("subclasses", []):
             reg("subclasses", s)
             for ft in s.get("features", []):
@@ -280,7 +284,7 @@ def main():
             continue
         rel = f.relative_to(ROOT).as_posix()
         code = f.parent.name
-        allowed = {"subclasses", "features", "spells", "races", "subraces", "traits", "backgrounds", "feats", "classSpells", "_about"}
+        allowed = {"classes", "subclasses", "features", "spells", "races", "subraces", "traits", "backgrounds", "feats", "classSpells", "_about"}
         for key in set(data) - allowed:
             rep.err(rel, f"unknown top-level key {key!r}")
 
@@ -320,6 +324,21 @@ def main():
                 feature(ft, f"{w}/{ft.get('id')}", s.get("class"))
         for ft in data.get("features", []):
             feature(ft, f"{rel}:{ft.get('id')}")
+        for k in data.get("classes", []):
+            w = f"{rel}:{k.get('id')}"
+            need(rep, w, k, ["id", "name", "en", "hitDie", "saves", "levels", "features", "page"])
+            if len(k.get("levels", [])) != 20:
+                rep.err(w, "levels must list all 20 class levels")
+            for p in k.get("profs", []) + k.get("multiProfs", []):
+                if p not in PROFS:
+                    rep.err(w, f"unknown proficiency {p!r}")
+            fids = {f.get("id") for f in k.get("features", [])}
+            for lv in k.get("levels", []):
+                for fid in lv.get("features", []):
+                    if fid not in fids and fid not in known["features"]:
+                        rep.err(w, f"level {lv.get('level')}: unknown feature {fid!r}")
+            for ft in k.get("features", []):
+                feature(ft, f"{w}/{ft.get('id')}", k.get("id"))
         for sp in data.get("spells", []):
             w = f"{rel}:{sp.get('id')}"
             need(rep, w, sp, ["id", "name", "en", "level", "school", "cast", "range", "dur", "comp", "classes", "desc", "page"])

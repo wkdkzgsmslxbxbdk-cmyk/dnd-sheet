@@ -67,6 +67,8 @@ export interface Feature extends Translated {
   desc: string[];
   choice: FeatureChoice | null;
   invocations: string[] | null;
+  /** optional class feature (Tasha's): the player turns it on */
+  optional?: boolean;
   prereq: unknown[] | null;
   src: string | null;
 }
@@ -88,7 +90,14 @@ export interface CharClass {
   saves: Ability[];
   profs: string[];
   skillChoice: { n: number; from: string[] } | null;
-  casting: { ability: Ability; level: number } | null;
+  casting: {
+    ability: Ability;
+    level: number;
+    /** multiclass caster level: full, half (paladin), halfUp (artificer, rounded up) */
+    progression?: "full" | "half" | "halfUp";
+    /** prepared spells = mod + level / half level (rounded down) / half level (rounded up) */
+    prepared?: "level" | "half" | "halfUp" | null;
+  } | null;
   multiclass: { ability: Ability; min: number; any?: boolean }[];
   /** proficiencies gained when this class is taken as a second+ class */
   multiProfs: string[];
@@ -96,6 +105,9 @@ export interface CharClass {
   startEquip: { id: string; qty: number }[];
   subclasses: string[];
   levels: ClassLevel[];
+  source?: string;
+  src?: string | null;
+  desc?: string[];
 }
 
 export interface Subclass extends Translated {

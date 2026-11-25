@@ -5,7 +5,7 @@
 import { catalog as defaultCatalog, type Catalog } from "../data/catalog";
 import type { Character, InvItem } from "./character";
 import { totalLevel } from "./character";
-import { ABILITIES, type Ability, type Equipment, type Feat, type Feature, type MagicItem, type Trait } from "./types";
+import { ABILITIES, type Ability, type CharClass, type Equipment, type Feat, type Feature, type MagicItem, type Trait } from "./types";
 import { choiceKey, countAt, dieAt, evalExpr, type Effect, type EffectOwner, type Expr } from "./effects";
 import { ITEM_BASE_WEAPON, ITEM_EFFECTS, type ItemMod } from "./itemEffects";
 import { add, dice, flat, formatDice, parseDice, type DiceExpr } from "./dice";
@@ -155,6 +155,18 @@ const FULL_CASTERS = new Set(["bard", "cleric", "druid", "sorcerer", "wizard"]);
 const HALF_CASTERS = new Set(["paladin", "ranger"]);
 const PREPARED_CASTERS = new Set(["cleric", "druid", "wizard", "paladin"]);
 
+/** choices key holding the optional class features (Tasha's) enabled for a class */
+export const optionalKey = (classId: string) => `optional:${classId}`;
+
+/** PHB multiclass caster level contributed by one class (book classes declare their progression) */
+function casterLevelOf(cls: { id: string; casting: CharClass["casting"] }, level: number): number {
+  const p = cls.casting?.progression;
+  if (p === "full" || (!p && FULL_CASTERS.has(cls.id))) return level;
+  if (p === "halfUp") return Math.ceil(level / 2);
+  if (p === "half" || (!p && HALF_CASTERS.has(cls.id))) return Math.floor(level / 2);
+  return 0;
+}
+
 function itemName(it: InvItem, base: Equipment | null, magic: MagicItem | null): string {
   if (it.custom) return it.custom.name;
   // generic "+N" variants read better as "Кинжал +1"
@@ -192,6 +204,11 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
     for (const lv of cls.levels.filter((l) => l.level <= e.level)) for (const f of lv.features) addFeature(f, e.classId);
     const sub = e.subclassId ? cat.subclasses[e.subclassId] : null;
     if (sub) for (const lv of sub.levels.filter((l) => l.level <= e.level)) for (const f of lv.features) addFeature(f, e.classId);
+    // optional class features (Tasha's) the player turned on
+    for (const id of c.choices[optionalKey(e.classId)] ?? []) {
+      const f = cat.features[id];
+      if (f?.optional && f.class === e.classId && f.level <= e.level) addFeature(id, e.classId);
+    }
   }
   // eldritch invocations are chosen under the "eldritch-invocations" feature
   const has = (id: string) => featureIds.has(id);
@@ -571,12 +588,13 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
     const dc = castDc(a, cls.id);
     const attack = castAttack(a, cls.id);
     let prepared: Calc | null = null;
-    if (PREPARED_CASTERS.has(cls.id)) {
-      const lvlPart = cls.id === "paladin" ? Math.floor(e.level / 2) : e.level;
+    const prepMode = cls.casting.prepared !== undefined ? cls.casting.prepared : PREPARED_CASTERS.has(cls.id) ? (cls.id === "paladin" ? "half" : "level") : null;
+    if (prepMode) {
+      const lvlPart = prepMode === "half" ? Math.floor(e.level / 2) : prepMode === "halfUp" ? Math.ceil(e.level / 2) : e.level;
       const raw = mods[a] + lvlPart;
       prepared = calc([
         { label: `Модификатор ${SHORT[a]}`, value: mods[a] },
-        { label: cls.id === "paladin" ? "½ уровня паладина" : `Уровень (${cls.name})`, value: lvlPart },
+        { label: prepMode === "level" ? `Уровень (${cls.name})` : `½ уровня (${cls.name})`, value: lvlPart },
         ...(raw < 1 ? [{ label: "Минимум 1", value: 1 - raw }] : []),
       ]);
     }
@@ -590,7 +608,7 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
       dc,
       attack,
       prepared,
-      known: PREPARED_CASTERS.has(cls.id) ? null : lv?.spell?.known ?? null,
+      known: prepMode ? null : lv?.spell?.known ?? null,
       cantrips: lv?.spell?.cantrips ?? 0,
       maxLevel,
       pact: cls.id === "warlock",
@@ -691,7 +709,7 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   } else if (slotClasses.length + subCasters.length > 1) {
     // PHB multiclassing: full levels + half of paladin/ranger + a third of Eldritch Knight / Arcane Trickster (rounded down)
     const casterLevel =
-      slotClasses.reduce((s, e) => s + (FULL_CASTERS.has(e.classId) ? e.level : HALF_CASTERS.has(e.classId) ? Math.floor(e.level / 2) : 0), 0) +
+      slotClasses.reduce((s, e) => s + casterLevelOf(cat.classes[e.classId], e.level), 0) +
       subCasters.reduce((s, x) => s + Math.floor(x.level / 3), 0);
     // the multiclass spellcaster table equals the full-caster (wizard) slot progression
     if (casterLevel > 0) slots = [...(cat.classes.wizard.levels[Math.min(20, casterLevel) - 1]?.spell?.slots ?? slots)];

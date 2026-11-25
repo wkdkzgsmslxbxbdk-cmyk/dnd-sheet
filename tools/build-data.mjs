@@ -462,7 +462,9 @@ if (existsSync(BOOKS)) {
   const pending = []; // feature options appended to their parent's choice after all files load
   for (const book of readdirSync(BOOKS)) {
     const dir = join(BOOKS, book);
-    for (const file of readdirSync(dir).filter((f) => f.endsWith(".json")).sort()) {
+    // class files first: their subclasses may live in other files of the same book
+    const files = readdirSync(dir).filter((f) => f.endsWith(".json")).sort((a, b) => (b.startsWith("class") - a.startsWith("class")) || a.localeCompare(b));
+    for (const file of files) {
       const rel = `${book}/${file}`;
       const data = JSON.parse(readFileSync(join(dir, file), "utf8"));
       const src = (page) => (page ? `${book}:${page}` : null);
@@ -470,10 +472,30 @@ if (existsSync(BOOKS)) {
       const addFeature = (f, cls, sub) => {
         addUnique("features", features, {
           id: f.id, name: f.name, en: f.en, class: f.class ?? cls, subclass: f.subclass ?? sub ?? null, level: f.level ?? 1,
-          parent: f.parent ?? null, desc: f.desc ?? [], choice: f.choice ?? null, invocations: null, prereq: f.prereq ?? null, ...common(f),
+          parent: f.parent ?? null, desc: f.desc ?? [], choice: f.choice ?? null, invocations: null, prereq: f.prereq ?? null,
+          optional: Boolean(f.optional), ...common(f),
         }, rel);
         for (const target of f.addTo ?? []) pending.push({ target, id: f.id, rel });
       };
+      // whole classes from books (Artificer); added before subclasses so they can attach
+      for (const k of data.classes ?? []) {
+        if (classes.some((c) => c.id === k.id)) throw new Error(`${rel}: duplicate class ${k.id}`);
+        for (const f of k.features ?? []) addFeature(f, k.id, null);
+        classes.push({
+          id: k.id, name: k.name, en: k.en, hitDie: k.hitDie, saves: k.saves, profs: k.profs ?? [],
+          skillChoice: k.skillChoice ?? null,
+          casting: k.casting ?? null,
+          multiclass: k.multiclass ?? [], multiProfs: k.multiProfs ?? [], multiSkill: k.multiSkill ?? 0,
+          startEquip: k.startEquip ?? [], subclasses: [],
+          levels: (k.levels ?? []).map((l) => ({
+            level: l.level, prof: l.prof ?? Math.ceil(l.level / 4) + 1, asi: 0, features: l.features ?? [],
+            spell: l.spell ? { cantrips: l.spell.cantrips ?? 0, known: l.spell.known ?? null, slots: Array.from({ length: 9 }, (_, i) => l.spell.slots?.[i] ?? 0) } : null,
+            cs: l.cs ?? null,
+          })),
+          source: book, src: src(k.page), desc: k.desc ?? [],
+        });
+        bookCount++;
+      }
       for (const s of data.subclasses ?? []) {
         const byLevel = new Map();
         for (const f of s.features ?? []) {
