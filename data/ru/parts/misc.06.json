@@ -1,0 +1,102 @@
+{
+ "proficiency:war-picks": {
+  "name": "Боевые кирки",
+  "_src": "phb:150"
+ },
+ "proficiency:warhammers": {
+  "name": "Боевые молоты",
+  "_src": "phb:150"
+ },
+ "proficiency:whips": {
+  "name": "Кнуты",
+  "_src": "phb:150"
+ },
+ "proficiency:blowguns": {
+  "name": "Духовые трубки",
+  "_src": "phb:150"
+ },
+ "proficiency:hand-crossbows": {
+  "name": "Арбалеты, ручные",
+  "_src": "phb:150"
+ },
+ "proficiency:crossbows-heavy": {
+  "name": "Арбалеты, тяжёлые",
+  "_src": "phb:150"
+ },
+ "proficiency:longbows": {
+  "name": "Длинные луки",
+  "_src": "phb:150"
+ },
+ "proficiency:nets": {
+  "name": "Сети",
+  "_src": "phb:150"
+ },
+ "proficiency:alchemists-supplies": {
+  "name": "Инструменты алхимика",
+  "_src": "phb:155"
+ },
+ "proficiency:brewers-supplies": {
+  "name": "Инструменты пивовара",
+  "_src": "phb:155"
+ },
+ "proficiency:calligraphers-supplies": {
+  "name": "Инструменты каллиграфа",
+  "_src": "phb:155"
+ },
+ "proficiency:carpenters-tools": {
+  "name": "Инструменты плотника",
+  "_src": "phb:155"
+ },
+ "proficiency:cartographers-tools": {
+  "name": "Инструменты картографа",
+  "_src": "phb:155"
+ },
+ "proficiency:cobblers-tools": {
+  "name": "Инструменты сапожника",
+  "_src": "phb:155"
+ },
+ "proficiency:cooks-utensils": {
+  "name": "Инструменты повара",
+  "_src": "phb:155"
+ },
+ "proficiency:glassblowers-tools": {
+  "name": "Инструменты стеклодува",
+  "_src": "phb:155"
+ },
+ "proficiency:jewelers-tools": {
+  "name": "Инструменты ювелира",
+  "_src": "phb:155"
+ },
+ "proficiency:leatherworkers-tools": {
+  "name": "Инструменты кожевника",
+  "_src": "phb:155"
+ },
+ "proficiency:masons-tools": {
+  "name": "Инструменты каменщика",
+  "_src": "phb:155"
+ },
+ "proficiency:painters-supplies": {
+  "name": "Инструменты художника",
+  "_src": "phb:155"
+ },
+ "proficiency:potters-tools": {
+  "name": "Инструменты гончара",
+  "_src": "phb:155"
+ },
+ "proficiency:smiths-tools": {
+  "name": "Инструменты кузнеца",
+  "_src": "phb:155"
+ },
+ "proficiency:tinkers-tools": {
+  "name": "Инструменты жестянщика",
+  "_src": "phb:155"
+ },
+ "proficiency:weavers-tools": {
+  "name": "Инструменты ткача",
+  "_src": "phb:155"
+ },
+ "proficiency:woodcarvers-tools": {
+  "name": "Инструменты резчика по дереву",
+  "_src": "phb:155"
+ }
+}

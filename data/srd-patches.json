@@ -1,0 +1,270 @@
+{
+  "_about": "Structured-data fixes applied by tools/build-data.mjs to the 5e-database copy of SRD 5.1. Found by checking against the Player's Handbook (data/verify/*.json). Format: file -> index -> { dotted.path: value }. `_why` documents each fix.",
+  "Spells": {
+    "flame-blade": {
+      "attack_type": "melee",
+      "_why": "PHB: 'You can use your action to make a melee spell attack with the fiery blade.'"
+    },
+    "hypnotic-pattern": {
+      "area_of_effect": {
+        "type": "cube",
+        "size": 30
+      },
+      "_why": "PHB: 30-foot cube"
+    },
+    "flame-strike": {
+      "area_of_effect": {
+        "type": "cylinder",
+        "size": 10
+      },
+      "_why": "PHB: 10-foot-radius, 40-foot-high cylinder; size is the radius like other cylinders"
+    },
+    "move-earth": {
+      "area_of_effect": null,
+      "_why": "PHB: an area of terrain no larger than 40 feet on a side, not a cone"
+    },
+    "magnificent-mansion": {
+      "area_of_effect": null,
+      "_why": "PHB: entrance 5 x 10 feet, dwelling up to 50 contiguous 10-foot cubes; not a 5-foot cube"
+    },
+    "heroism": {
+      "higher_level": [
+        "When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each slot level above 1st."
+      ],
+      "_why": "PHB has an 'At Higher Levels' entry missing from the database"
+    },
+    "scorching-ray": {
+      "attack_type": "ranged",
+      "_why": "PHB: Make a ranged spell attack for each ray."
+    },
+    "spirit-guardians": {
+      "dc": {
+        "dc_type": {
+          "index": "wis",
+          "name": "WIS"
+        },
+        "dc_success": "half"
+      },
+      "_why": "PHB: Wisdom saving throw, half damage on success"
+    },
+    "weird": {
+      "dc": {
+        "dc_type": {
+          "index": "wis",
+          "name": "WIS"
+        },
+        "dc_success": "other"
+      },
+      "_why": "PHB: Wisdom saving throw"
+    },
+    "web": {
+      "dc": {
+        "dc_type": {
+          "index": "dex",
+          "name": "DEX"
+        },
+        "dc_success": "other"
+      },
+      "_why": "PHB: Dexterity saving throw or restrained"
+    },
+    "sleet-storm": {
+      "dc": {
+        "dc_type": {
+          "index": "dex",
+          "name": "DEX"
+        },
+        "dc_success": "other"
+      },
+      "_why": "PHB: Dexterity save or fall prone; Constitution save for concentration"
+    },
+    "wall-of-stone": {
+      "dc": {
+        "dc_type": {
+          "index": "dex",
+          "name": "DEX"
+        },
+        "dc_success": "other"
+      },
+      "_why": "PHB: Dexterity saving throw"
+    },
+    "seeming": {
+      "dc": {
+        "dc_type": {
+          "index": "cha",
+          "name": "CHA"
+        },
+        "dc_success": "other"
+      },
+      "_why": "PHB: unwilling creature can make a Charisma saving throw"
+    },
+    "zone-of-truth": {
+      "dc": {
+        "dc_type": {
+          "index": "cha",
+          "name": "CHA"
+        },
+        "dc_success": "other"
+      },
+      "_why": "PHB: Charisma saving throw"
+    },
+    "sanctuary": {
+      "dc": {
+        "dc_type": {
+          "index": "wis",
+          "name": "WIS"
+        },
+        "dc_success": "other"
+      },
+      "_why": "PHB: attacker must make a Wisdom saving throw"
+    },
+    "power-word-stun": {
+      "dc": {
+        "dc_type": {
+          "index": "con",
+          "name": "CON"
+        },
+        "dc_success": "other"
+      },
+      "_why": "PHB: Constitution saving throw at the end of each of its turns"
+    },
+    "true-polymorph": {
+      "dc": {
+        "dc_type": {
+          "index": "wis",
+          "name": "WIS"
+        },
+        "dc_success": "other"
+      },
+      "_why": "PHB: unwilling creature makes a Wisdom saving throw"
+    },
+    "revivify": {
+      "school": {
+        "index": "necromancy",
+        "name": "Necromancy"
+      },
+      "_why": "PHB: 3rd-level necromancy"
+    },
+    "mass-cure-wounds": {
+      "school": {
+        "index": "evocation",
+        "name": "Evocation"
+      },
+      "_why": "PHB: 5th-level evocation, like cure wounds"
+    },
+    "mass-heal": {
+      "school": {
+        "index": "evocation",
+        "name": "Evocation"
+      },
+      "_why": "PHB: 9th-level evocation"
+    },
+    "plant-growth": {
+      "casting_time": "1 action or 8 hours",
+      "_why": "PHB: Casting Time: 1 action or 8 hours"
+    },
+    "animal-friendship": {
+      "higher_level": [
+        "When you cast this spell using a spell slot of 2nd level or higher, you can affect one additional beast for each slot level above 1st."
+      ],
+      "_why": "PHB has an At Higher Levels entry missing from the database"
+    },
+    "disintegrate": {
+      "damage": [
+        {
+          "damage_type": {
+            "index": "force",
+            "name": "Force"
+          },
+          "damage_at_slot_level": {
+            "6": "10d6 + 40",
+            "7": "13d6 + 40",
+            "8": "16d6 + 40",
+            "9": "19d6 + 40"
+          }
+        }
+      ],
+      "_why": "PHB: the damage increases by 3d6 for each slot level above 6th"
+    },
+    "arcane-hand": {
+      "attack_type": "melee",
+      "damage": [
+        {
+          "damage_type": {
+            "index": "force",
+            "name": "Force"
+          },
+          "damage_at_slot_level": {
+            "5": "4d8",
+            "6": "6d8",
+            "7": "8d8",
+            "8": "10d8",
+            "9": "12d8"
+          }
+        }
+      ],
+      "_why": "PHB: Clenched Fist — melee spell attack, 4d8 force; +2d8 for each slot level above 5th"
+    },
+    "call-lightning": {
+      "dc": {
+        "dc_type": {
+          "index": "dex",
+          "name": "DEX"
+        },
+        "dc_success": "half"
+      },
+      "_why": "PHB: Dexterity saving throw, half damage on success"
+    },
+    "earthquake": {
+      "dc": {
+        "dc_type": {
+          "index": "con",
+          "name": "CON"
+        },
+        "dc_success": "other"
+      },
+      "_why": "PHB: Constitution saving throw (concentration, fissures use Dexterity)"
+    },
+    "antipathy-sympathy": {
+      "dc": {
+        "dc_type": {
+          "index": "wis",
+          "name": "WIS"
+        },
+        "dc_success": "other"
+      },
+      "_why": "PHB: Wisdom saving throw"
+    },
+    "detect-thoughts": {
+      "dc": {
+        "dc_type": {
+          "index": "wis",
+          "name": "WIS"
+        },
+        "dc_success": "other"
+      },
+      "_why": "PHB: Wisdom saving throw to probe deeper"
+    },
+    "arcane-eye": {
+      "area_of_effect": null,
+      "_why": "PHB: no area of effect"
+    }
+  },
+  "Levels": {
+    "druid-7": {
+      "class_specific.wild_shape_max_cr": 0.5,
+      "_why": "PHB Beast Shapes table: CR 1 only from 8th level"
+    },
+    "warlock-4": {
+      "class_specific.invocations_known": 2,
+      "_why": "PHB Warlock table: 2 invocations at 4th level"
+    },
+    "warlock-6": {
+      "class_specific.invocations_known": 3,
+      "_why": "PHB Warlock table: 3 invocations at 6th level"
+    },
+    "sorcerer-16": {
+      "class_specific.metamagic_known": 3,
+      "_why": "PHB: fourth Metamagic option at 17th level"
+    }
+  }
+}

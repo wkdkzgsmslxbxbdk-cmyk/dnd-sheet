@@ -1,0 +1,6 @@
+node_modules/
+dist/
+# copyrighted rulebooks: local use only (name/terminology lookup and rules checks)
+sources/books-raw/
+sources/books-text/
+*.log

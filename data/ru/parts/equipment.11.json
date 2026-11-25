@@ -1,0 +1,105 @@
+{
+ "category:martial-ranged-weapons": {
+  "name": "Воинское дальнобойное оружие",
+  "_src": "phb:150"
+ },
+ "category:light-armor": {
+  "name": "Лёгкий доспех",
+  "_src": "phb:146"
+ },
+ "category:medium-armor": {
+  "name": "Средний доспех",
+  "_src": "phb:146"
+ },
+ "category:heavy-armor": {
+  "name": "Тяжёлый доспех",
+  "_src": "phb:146"
+ },
+ "category:shields": {
+  "name": "Щит",
+  "_src": "phb:146"
+ },
+ "category:standard-gear": {
+  "name": "Стандартное снаряжение",
+  "_src": "phb:151",
+  "_name_check": "в книге нет такой категории; переведено по названию SRD"
+ },
+ "category:kits": {
+  "name": "Наборы",
+  "_src": "phb:152",
+  "_name_check": "в книге нет такой категории; переведено по названию SRD"
+ },
+ "category:equipment-packs": {
+  "name": "Наборы снаряжения",
+  "_src": "phb:152"
+ },
+ "category:artisans-tools": {
+  "name": "Инструменты ремесленников",
+  "_src": "phb:155"
+ },
+ "category:gaming-sets": {
+  "name": "Игровой набор",
+  "_src": "phb:155"
+ },
+ "category:musical-instruments": {
+  "name": "Музыкальные инструменты",
+  "_src": "phb:155"
+ },
+ "category:other-tools": {
+  "name": "Прочие инструменты",
+  "_src": "phb:155",
+  "_name_check": "в книге нет такой категории; переведено по названию SRD"
+ },
+ "category:mounts-and-other-animals": {
+  "name": "Скакуны и другие животные",
+  "_src": "phb:158"
+ },
+ "category:tack-harness-and-drawn-vehicles": {
+  "name": "Сёдла, упряжь и транспорт",
+  "_src": "phb:158"
+ },
+ "category:land-vehicles": {
+  "name": "Наземный транспорт",
+  "_src": "phb:155"
+ },
+ "category:waterborne-vehicles": {
+  "name": "Водный транспорт",
+  "_src": "phb:158"
+ },
+ "category:arcane-foci": {
+  "name": "Магические фокусировки",
+  "_src": "phb:151"
+ },
+ "category:druidic-foci": {
+  "name": "Фокусировки друидов",
+  "_src": "phb:151"
+ },
+ "category:holy-symbols": {
+  "name": "Священные символы",
+  "_src": "phb:151"
+ },
+ "category:wondrous-items": {
+  "name": "Чудесные предметы",
+  "_src": "dmg:141"
+ },
+ "category:rod": {
+  "name": "Жезл",
+  "_src": "dmg:140"
+ },
+ "category:potion": {
+  "name": "Зелье",
+  "_src": "dmg:140"
+ },
+ "category:ring": {
+  "name": "Кольцо",
+  "_src": "dmg:140"
+ },
+ "category:scroll": {
+  "name": "Свиток",
+  "_src": "dmg:141"
+ },
+ "category:staff": {
+  "name": "Посох",
+  "_src": "dmg:140"
+ }
+}

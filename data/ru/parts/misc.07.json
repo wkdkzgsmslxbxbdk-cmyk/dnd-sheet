@@ -1,0 +1,102 @@
+{
+ "proficiency:disguise-kit": {
+  "name": "Набор для грима",
+  "_src": "phb:155"
+ },
+ "proficiency:forgery-kit": {
+  "name": "Набор для фальсификации",
+  "_src": "phb:155"
+ },
+ "proficiency:dice-set": {
+  "name": "Кости",
+  "_src": "phb:155"
+ },
+ "proficiency:playing-card-set": {
+  "name": "Карты",
+  "_src": "phb:155"
+ },
+ "proficiency:bagpipes": {
+  "name": "Волынка",
+  "_src": "phb:155"
+ },
+ "proficiency:drum": {
+  "name": "Барабан",
+  "_src": "phb:155"
+ },
+ "proficiency:dulcimer": {
+  "name": "Цимбалы",
+  "_src": "phb:155"
+ },
+ "proficiency:flute": {
+  "name": "Флейта",
+  "_src": "phb:155"
+ },
+ "proficiency:lute": {
+  "name": "Лютня",
+  "_src": "phb:155"
+ },
+ "proficiency:lyre": {
+  "name": "Лира",
+  "_src": "phb:155"
+ },
+ "proficiency:horn": {
+  "name": "Рожок",
+  "_src": "phb:155"
+ },
+ "proficiency:pan-flute": {
+  "name": "Свирель",
+  "_src": "phb:155"
+ },
+ "proficiency:shawm": {
+  "name": "Шалмей",
+  "_src": "phb:155"
+ },
+ "proficiency:viol": {
+  "name": "Виола",
+  "_src": "phb:155"
+ },
+ "proficiency:herbalism-kit": {
+  "name": "Набор травника",
+  "_src": "phb:155"
+ },
+ "proficiency:navigators-tools": {
+  "name": "Инструменты навигатора",
+  "_src": "phb:155"
+ },
+ "proficiency:poisoners-kit": {
+  "name": "Инструменты отравителя",
+  "_src": "phb:155"
+ },
+ "proficiency:thieves-tools": {
+  "name": "Воровские инструменты",
+  "_src": "phb:155"
+ },
+ "proficiency:land-vehicles": {
+  "name": "Наземный транспорт",
+  "_src": "phb:155"
+ },
+ "proficiency:water-vehicles": {
+  "name": "Водный транспорт",
+  "_src": "phb:158"
+ },
+ "proficiency:saving-throw-str": {
+  "name": "Спасбросок: СИЛ",
+  "_src": "phb:175"
+ },
+ "proficiency:saving-throw-dex": {
+  "name": "Спасбросок: ЛОВ",
+  "_src": "phb:175"
+ },
+ "proficiency:saving-throw-con": {
+  "name": "Спасбросок: ТЕЛ",
+  "_src": "phb:175"
+ },
+ "proficiency:saving-throw-int": {
+  "name": "Спасбросок: ИНТ",
+  "_src": "phb:175"
+ },
+ "proficiency:saving-throw-wis": {
+  "name": "Спасбросок: МДР",
+  "_src": "phb:175"
+ }
+}

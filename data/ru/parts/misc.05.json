@@ -1,0 +1,102 @@
+{
+ "proficiency:javelins": {
+  "name": "Метательные копья",
+  "_src": "phb:150"
+ },
+ "proficiency:light-hammers": {
+  "name": "Лёгкие молоты",
+  "_src": "phb:150"
+ },
+ "proficiency:maces": {
+  "name": "Булавы",
+  "_src": "phb:150"
+ },
+ "proficiency:quarterstaffs": {
+  "name": "Боевые посохи",
+  "_src": "phb:150"
+ },
+ "proficiency:sickles": {
+  "name": "Серпы",
+  "_src": "phb:150"
+ },
+ "proficiency:spears": {
+  "name": "Копья",
+  "_src": "phb:150"
+ },
+ "proficiency:crossbows-light": {
+  "name": "Арбалеты, лёгкие",
+  "_src": "phb:150"
+ },
+ "proficiency:darts": {
+  "name": "Дротики",
+  "_src": "phb:150"
+ },
+ "proficiency:shortbows": {
+  "name": "Короткие луки",
+  "_src": "phb:150"
+ },
+ "proficiency:slings": {
+  "name": "Пращи",
+  "_src": "phb:150"
+ },
+ "proficiency:battleaxes": {
+  "name": "Боевые топоры",
+  "_src": "phb:150"
+ },
+ "proficiency:flails": {
+  "name": "Цепы",
+  "_src": "phb:150"
+ },
+ "proficiency:glaives": {
+  "name": "Глефы",
+  "_src": "phb:150"
+ },
+ "proficiency:greataxes": {
+  "name": "Секиры",
+  "_src": "phb:150"
+ },
+ "proficiency:greatswords": {
+  "name": "Двуручные мечи",
+  "_src": "phb:150"
+ },
+ "proficiency:halberds": {
+  "name": "Алебарды",
+  "_src": "phb:150"
+ },
+ "proficiency:lances": {
+  "name": "Длинные копья",
+  "_src": "phb:150"
+ },
+ "proficiency:longswords": {
+  "name": "Длинные мечи",
+  "_src": "phb:150"
+ },
+ "proficiency:mauls": {
+  "name": "Молоты",
+  "_src": "phb:150"
+ },
+ "proficiency:morningstars": {
+  "name": "Моргенштерны",
+  "_src": "phb:150"
+ },
+ "proficiency:pikes": {
+  "name": "Пики",
+  "_src": "phb:150"
+ },
+ "proficiency:rapiers": {
+  "name": "Рапиры",
+  "_src": "phb:150"
+ },
+ "proficiency:scimitars": {
+  "name": "Скимитары",
+  "_src": "phb:150"
+ },
+ "proficiency:shortswords": {
+  "name": "Короткие мечи",
+  "_src": "phb:150"
+ },
+ "proficiency:tridents": {
+  "name": "Трезубцы",
+  "_src": "phb:150"
+ }
+}

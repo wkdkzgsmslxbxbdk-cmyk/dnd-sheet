@@ -1,0 +1,6 @@
+{
+  "_about": "Typos in the 5e-database copy of SRD 5.1, fixed before slicing/building. Each entry: file -> index -> field -> [wrong, right]. Only literal typos go here; rule differences are fixed in data/ru/parts after checking against the Player's Handbook.",
+  "Spells": {
+    "moonbeam": { "higher_level": ["1dl0", "1d10"] }
+  }
+}

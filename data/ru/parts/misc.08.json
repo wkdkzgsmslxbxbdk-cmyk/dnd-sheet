@@ -1,0 +1,78 @@
+{
+ "proficiency:saving-throw-cha": {
+  "name": "Спасбросок: ХАР",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-acrobatics": {
+  "name": "Навык: Акробатика",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-animal-handling": {
+  "name": "Навык: Уход за животными",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-arcana": {
+  "name": "Навык: Магия",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-athletics": {
+  "name": "Навык: Атлетика",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-deception": {
+  "name": "Навык: Обман",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-history": {
+  "name": "Навык: История",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-insight": {
+  "name": "Навык: Проницательность",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-intimidation": {
+  "name": "Навык: Запугивание",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-investigation": {
+  "name": "Навык: Анализ",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-medicine": {
+  "name": "Навык: Медицина",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-nature": {
+  "name": "Навык: Природа",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-perception": {
+  "name": "Навык: Внимательность",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-performance": {
+  "name": "Навык: Выступление",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-persuasion": {
+  "name": "Навык: Убеждение",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-religion": {
+  "name": "Навык: Религия",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-sleight-of-hand": {
+  "name": "Навык: Ловкость рук",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-stealth": {
+  "name": "Навык: Скрытность",
+  "_src": "phb:175"
+ },
+ "proficiency:skill-survival": {
+  "name": "Навык: Выживание",
+  "_src": "phb:175"
+ }
+}
