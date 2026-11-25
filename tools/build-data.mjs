@@ -537,7 +537,7 @@ if (existsSync(BOOKS)) {
         addUnique("subraces", subraces, {
           id: s.id, name: s.name, en: s.en, race: s.race, desc: (s.desc ?? []).join("\n"), bonuses: s.bonuses ?? {}, traits: s.traits ?? [],
           profs: s.profs ?? [], languageChoice: s.languageChoice ?? null, speed: s.speed ?? null,
-          replaceBonuses: Boolean(s.replaceBonuses), ...common(s),
+          replaceBonuses: Boolean(s.replaceBonuses), removeTraits: s.removeTraits ?? [], ...common(s),
         }, rel);
       }
       for (const b of data.backgrounds ?? []) {

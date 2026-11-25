@@ -1,0 +1,840 @@
+{
+ "races": [
+  {
+   "id": "gith",
+   "name": "Гит",
+   "en": "Gith",
+   "page": 97,
+   "speed": 30,
+   "size": "Средний",
+   "bonuses": {
+    "int": 1
+   },
+   "languages": [
+    "common"
+   ],
+   "traits": [
+    "gith-language"
+   ],
+   "desc": [
+    "Народ, разделившийся на гитъянки и гитцераев; создаётся с разрешения Мастера. Прибавка: ИНТ +1 (плюс бонус подрасы). Взрослеют в позднем подростковом возрасте, живут около века. Рост до 6 футов, Средний размер, скорость 30 футов."
+   ]
+  }
+ ],
+ "subraces": [
+  {
+   "id": "githyanki",
+   "race": "gith",
+   "name": "Гитъянки",
+   "en": "Githyanki",
+   "page": 97,
+   "bonuses": {
+    "str": 2
+   },
+   "traits": [
+    "decadent-mastery",
+    "martial-prodigy",
+    "githyanki-psionics"
+   ],
+   "desc": [
+    "Воинственные гиты, служащие королеве-личу Влаакит. Прибавка: СИЛ +2. Склонны к законно-злому мировоззрению."
+   ]
+  },
+  {
+   "id": "githzerai",
+   "race": "gith",
+   "name": "Гитцерай",
+   "en": "Githzerai",
+   "page": 98,
+   "bonuses": {
+    "wis": 2
+   },
+   "traits": [
+    "mental-discipline",
+    "githzerai-psionics"
+   ],
+   "desc": [
+    "Монахи-псионики из крепостей Лимбо. Прибавка: МДР +2. Склонны к законно-нейтральному мировоззрению."
+   ]
+  },
+  {
+   "id": "eladrin-autumn",
+   "race": "elf",
+   "name": "Эладрин (осень)",
+   "en": "Eladrin (Autumn)",
+   "page": 64,
+   "bonuses": {
+    "cha": 1
+   },
+   "traits": [
+    "fey-step",
+    "eladrin-autumn"
+   ],
+   "desc": [
+    "Эльф Страны Фей. Прибавка: ХАР +1. Время года — осень."
+   ]
+  },
+  {
+   "id": "eladrin-winter",
+   "race": "elf",
+   "name": "Эладрин (зима)",
+   "en": "Eladrin (Winter)",
+   "page": 64,
+   "bonuses": {
+    "cha": 1
+   },
+   "traits": [
+    "fey-step",
+    "eladrin-winter"
+   ],
+   "desc": [
+    "Эльф Страны Фей. Прибавка: ХАР +1. Время года — зима."
+   ]
+  },
+  {
+   "id": "eladrin-spring",
+   "race": "elf",
+   "name": "Эладрин (весна)",
+   "en": "Eladrin (Spring)",
+   "page": 64,
+   "bonuses": {
+    "cha": 1
+   },
+   "traits": [
+    "fey-step",
+    "eladrin-spring"
+   ],
+   "desc": [
+    "Эльф Страны Фей. Прибавка: ХАР +1. Время года — весна."
+   ]
+  },
+  {
+   "id": "eladrin-summer",
+   "race": "elf",
+   "name": "Эладрин (лето)",
+   "en": "Eladrin (Summer)",
+   "page": 64,
+   "bonuses": {
+    "cha": 1
+   },
+   "traits": [
+    "fey-step",
+    "eladrin-summer"
+   ],
+   "desc": [
+    "Эльф Страны Фей. Прибавка: ХАР +1. Время года — лето."
+   ]
+  },
+  {
+   "id": "sea-elf",
+   "race": "elf",
+   "name": "Морской эльф",
+   "en": "Sea Elf",
+   "page": 64,
+   "bonuses": {
+    "con": 1
+   },
+   "traits": [
+    "sea-elf-training",
+    "child-of-the-sea",
+    "friend-of-the-sea",
+    "sea-elf-language"
+   ],
+   "desc": [
+    "Эльфы океанов. Прибавка: ТЕЛ +1."
+   ]
+  },
+  {
+   "id": "shadar-kai",
+   "race": "elf",
+   "name": "Шадар-кай",
+   "en": "Shadar-kai",
+   "page": 65,
+   "bonuses": {
+    "con": 1
+   },
+   "traits": [
+    "shadar-kai-necrotic-resistance",
+    "blessing-of-the-raven-queen"
+   ],
+   "desc": [
+    "Служители Королевы Воронов из Царства Теней. Прибавка: ТЕЛ +1."
+   ]
+  },
+  {
+   "id": "baalzebul-tiefling",
+   "race": "tiefling",
+   "name": "Тифлинг Вельзевула",
+   "en": "Baalzebul Tiefling",
+   "page": 23,
+   "bonuses": {
+    "cha": 2,
+    "int": 1
+   },
+   "replaceBonuses": true,
+   "traits": [
+    "legacy-of-maladomini"
+   ],
+   "desc": [
+    "Подраса тифлинга: прибавки ХАР +2, ИНТ +1 вместо обычных, а «Наследие Маладомини» заменяет «Дьявольское наследие» (в списке особенностей расы оно остаётся, игнорируйте его)."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  },
+  {
+   "id": "dispater-tiefling",
+   "race": "tiefling",
+   "name": "Тифлинг Диспатера",
+   "en": "Dispater Tiefling",
+   "page": 23,
+   "bonuses": {
+    "cha": 2,
+    "dex": 1
+   },
+   "replaceBonuses": true,
+   "traits": [
+    "legacy-of-dis"
+   ],
+   "desc": [
+    "Подраса тифлинга: прибавки ХАР +2, ЛОВ +1 вместо обычных; «Наследие Диса» заменяет «Дьявольское наследие»."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  },
+  {
+   "id": "fierna-tiefling",
+   "race": "tiefling",
+   "name": "Тифлинг Фьёрны",
+   "en": "Fierna Tiefling",
+   "page": 23,
+   "bonuses": {
+    "cha": 2,
+    "wis": 1
+   },
+   "replaceBonuses": true,
+   "traits": [
+    "legacy-of-phlegethos"
+   ],
+   "desc": [
+    "Подраса тифлинга: прибавки ХАР +2, МДР +1 вместо обычных; «Наследие Флегетоса» заменяет «Дьявольское наследие»."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  },
+  {
+   "id": "glasya-tiefling",
+   "race": "tiefling",
+   "name": "Тифлинг Гласии",
+   "en": "Glasya Tiefling",
+   "page": 24,
+   "bonuses": {
+    "cha": 2,
+    "dex": 1
+   },
+   "replaceBonuses": true,
+   "traits": [
+    "legacy-of-malbolge"
+   ],
+   "desc": [
+    "Подраса тифлинга: прибавки ХАР +2, ЛОВ +1 вместо обычных; «Наследие Малболга» заменяет «Дьявольское наследие»."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  },
+  {
+   "id": "levistus-tiefling",
+   "race": "tiefling",
+   "name": "Тифлинг Левистуса",
+   "en": "Levistus Tiefling",
+   "page": 24,
+   "bonuses": {
+    "cha": 2,
+    "con": 1
+   },
+   "replaceBonuses": true,
+   "traits": [
+    "legacy-of-stygia"
+   ],
+   "desc": [
+    "Подраса тифлинга: прибавки ХАР +2, ТЕЛ +1 вместо обычных; «Наследие Стигии» заменяет «Дьявольское наследие»."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  },
+  {
+   "id": "mammon-tiefling",
+   "race": "tiefling",
+   "name": "Тифлинг Маммона",
+   "en": "Mammon Tiefling",
+   "page": 24,
+   "bonuses": {
+    "cha": 2,
+    "int": 1
+   },
+   "replaceBonuses": true,
+   "traits": [
+    "legacy-of-minauros"
+   ],
+   "desc": [
+    "Подраса тифлинга: прибавки ХАР +2, ИНТ +1 вместо обычных; «Наследие Минауроса» заменяет «Дьявольское наследие»."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  },
+  {
+   "id": "mephistopheles-tiefling",
+   "race": "tiefling",
+   "name": "Тифлинг Мефистофеля",
+   "en": "Mephistopheles Tiefling",
+   "page": 24,
+   "bonuses": {
+    "cha": 2,
+    "int": 1
+   },
+   "replaceBonuses": true,
+   "traits": [
+    "legacy-of-cania"
+   ],
+   "desc": [
+    "Подраса тифлинга: прибавки ХАР +2, ИНТ +1 вместо обычных; «Наследие Кании» заменяет «Дьявольское наследие»."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  },
+  {
+   "id": "zariel-tiefling",
+   "race": "tiefling",
+   "name": "Тифлинг Зариэль",
+   "en": "Zariel Tiefling",
+   "page": 25,
+   "bonuses": {
+    "cha": 2,
+    "str": 1
+   },
+   "replaceBonuses": true,
+   "traits": [
+    "legacy-of-avernus"
+   ],
+   "desc": [
+    "Подраса тифлинга: прибавки ХАР +2, СИЛ +1 вместо обычных; «Наследие Авернуса» заменяет «Дьявольское наследие»."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  }
+ ],
+ "traits": [
+  {
+   "id": "gith-language",
+   "name": "Языки гитов",
+   "en": "Languages",
+   "page": 97,
+   "desc": [
+    "Вы говорите, читаете и пишете на Общем и гитском. Гитского языка нет в списке приложения: отметьте его вручную."
+   ]
+  },
+  {
+   "id": "decadent-mastery",
+   "name": "Декадентское мастерство",
+   "en": "Decadent Mastery",
+   "page": 97,
+   "desc": [
+    "Вы изучаете один язык на выбор и получаете владение одним навыком или инструментом на выбор (навык или инструмент выберите вручную)."
+   ],
+   "effects": [
+    {
+     "k": "languageChoice",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "id": "martial-prodigy",
+   "name": "Воинское воспитание",
+   "en": "Martial Prodigy",
+   "page": 98,
+   "desc": [
+    "Вы владеете лёгкими и средними доспехами, короткими, длинными и двуручными мечами."
+   ],
+   "effects": [
+    {
+     "k": "prof",
+     "ids": [
+      "light-armor",
+      "medium-armor",
+      "shortswords",
+      "longswords",
+      "greatswords"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "githyanki-psionics",
+   "name": "Псионика гитъянки",
+   "en": "Githyanki Psionics",
+   "page": 98,
+   "desc": [
+    "Вы знаете заговор «волшебная рука», рука при этом невидима. С 3 уровня раз между продолжительными отдыхами можете наложить «прыжок», с 5 уровня так же — «туманный шаг». Материальные компоненты не нужны. Базовая характеристика — ИНТ."
+   ],
+   "effects": [
+    {
+     "k": "spells",
+     "ability": "int",
+     "uses": "longRest",
+     "note": "без материальных компонентов; рука невидима",
+     "spells": [
+      {
+       "spell": "mage-hand",
+       "level": 1
+      },
+      {
+       "spell": "jump",
+       "level": 3
+      },
+      {
+       "spell": "misty-step",
+       "level": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mental-discipline",
+   "name": "Ментальная дисциплина",
+   "en": "Mental Discipline",
+   "page": 98,
+   "desc": [
+    "Вы совершаете спасброски от очарования и испуга с преимуществом."
+   ]
+  },
+  {
+   "id": "githzerai-psionics",
+   "name": "Псионика гитцераев",
+   "en": "Githzerai Psionics",
+   "page": 98,
+   "desc": [
+    "Вы знаете заговор «волшебная рука», рука при этом невидима. С 3 уровня раз между продолжительными отдыхами можете наложить «щит», с 5 уровня так же — «обнаружение мыслей». Материальные компоненты не нужны. Базовая характеристика — МДР."
+   ],
+   "effects": [
+    {
+     "k": "spells",
+     "ability": "wis",
+     "uses": "longRest",
+     "note": "без материальных компонентов; рука невидима",
+     "spells": [
+      {
+       "spell": "mage-hand",
+       "level": 1
+      },
+      {
+       "spell": "shield",
+       "level": 3
+      },
+      {
+       "spell": "detect-thoughts",
+       "level": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fey-step",
+   "name": "Фейский шаг",
+   "en": "Fey Step",
+   "page": 64,
+   "desc": [
+    "Бонусным действием вы магически телепортируетесь на 30 футов в свободное пространство, которое видите. Повторно — после короткого или продолжительного отдыха. С 3 уровня Фейский шаг получает дополнительный эффект по времени года (Сл спасброска = 8 + бонус мастерства + модификатор ХАР)."
+   ],
+   "effects": [
+    {
+     "k": "resource",
+     "id": "fey-step",
+     "name": "Фейский шаг",
+     "max": 1,
+     "reset": "short"
+    }
+   ]
+  },
+  {
+   "id": "eladrin-autumn",
+   "name": "Осень",
+   "en": "Autumn",
+   "page": 64,
+   "desc": [
+    "С 3 уровня сразу после Фейского шага до двух выбранных вами существ в пределах 10 футов проходят спасбросок МДР; при провале они очарованы вами на 1 минуту или пока вы или ваши спутники не нанесёте им урон."
+   ]
+  },
+  {
+   "id": "eladrin-winter",
+   "name": "Зима",
+   "en": "Winter",
+   "page": 64,
+   "desc": [
+    "С 3 уровня при Фейском шаге одно выбранное вами существо в пределах 5 футов (до вашей телепортации) проходит спасбросок МДР; при провале оно напугано вами до конца вашего следующего хода."
+   ]
+  },
+  {
+   "id": "eladrin-spring",
+   "name": "Весна",
+   "en": "Spring",
+   "page": 64,
+   "desc": [
+    "С 3 уровня при Фейском шаге вы можете коснуться одного согласного существа в пределах 5 футов: оно телепортируется вместо вас в выбранное вами свободное пространство в пределах 30 футов, которое вы видите."
+   ]
+  },
+  {
+   "id": "eladrin-summer",
+   "name": "Лето",
+   "en": "Summer",
+   "page": 64,
+   "desc": [
+    "С 3 уровня сразу после Фейского шага каждое выбранное вами существо в пределах 5 футов получает урон огнём, равный вашему модификатору ХАР (минимум 1)."
+   ]
+  },
+  {
+   "id": "sea-elf-training",
+   "name": "Боевая подготовка морских эльфов",
+   "en": "Sea Elf Training",
+   "page": 64,
+   "desc": [
+    "Вы владеете копьём, трезубцем, лёгким арбалетом и сетью."
+   ],
+   "effects": [
+    {
+     "k": "prof",
+     "ids": [
+      "spears",
+      "tridents",
+      "crossbows-light",
+      "nets"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "child-of-the-sea",
+   "name": "Дитя морей",
+   "en": "Child of the Sea",
+   "page": 64,
+   "desc": [
+    "Вы плаваете со скоростью 30 футов и можете дышать под водой."
+   ],
+   "effects": [
+    {
+     "k": "speed",
+     "mode": "swim",
+     "value": 30,
+     "set": true
+    }
+   ]
+  },
+  {
+   "id": "friend-of-the-sea",
+   "name": "Морские побратимы",
+   "en": "Friend of the Sea",
+   "page": 64,
+   "desc": [
+    "Простыми жестами и звуками вы можете наладить контакт с любым существом, обладающим природной скоростью плавания."
+   ]
+  },
+  {
+   "id": "sea-elf-language",
+   "name": "Язык морских эльфов",
+   "en": "Sea Elf Language",
+   "page": 64,
+   "desc": [
+    "Вы говорите, читаете и пишете на Акване. Аквана нет в списке приложения: отметьте язык вручную."
+   ]
+  },
+  {
+   "id": "shadar-kai-necrotic-resistance",
+   "name": "Некротическое сопротивление",
+   "en": "Necrotic Resistance",
+   "page": 65,
+   "desc": [
+    "Вы получаете сопротивление некротическому урону."
+   ],
+   "effects": [
+    {
+     "k": "resist",
+     "types": [
+      "necrotic"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "blessing-of-the-raven-queen",
+   "name": "Благословение Королевы Воронов",
+   "en": "Blessing of the Raven Queen",
+   "page": 65,
+   "desc": [
+    "Бонусным действием вы магически телепортируетесь на 30 футов в свободное видимое пространство. Повторно — после продолжительного отдыха. С 3 уровня после такой телепортации вы получаете сопротивление всему урону до начала вашего следующего хода, а облик становится призрачным и полупрозрачным."
+   ],
+   "effects": [
+    {
+     "k": "resource",
+     "id": "blessing-of-the-raven-queen",
+     "name": "Благословение Королевы Воронов",
+     "max": 1,
+     "reset": "long"
+    }
+   ]
+  },
+  {
+   "id": "legacy-of-maladomini",
+   "name": "Наследие Маладомини",
+   "en": "Legacy of Maladomini",
+   "page": 23,
+   "desc": [
+    "Вы знаете заклинание «чудотворство». С 3 уровня раз в день можете наложить «луч болезни» как заклинание 2 уровня, с 5 уровня так же — «корону безумия». «Раз в день» значит: после продолжительного отдыха. Базовая характеристика — ХАР."
+   ],
+   "effects": [
+    {
+     "k": "spells",
+     "ability": "cha",
+     "uses": "longRest",
+     "note": "«луч болезни» — как заклинание 2 уровня",
+     "spells": [
+      {
+       "spell": "thaumaturgy",
+       "level": 1
+      },
+      {
+       "spell": "ray-of-sickness",
+       "level": 3
+      },
+      {
+       "spell": "crown-of-madness",
+       "level": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legacy-of-dis",
+   "name": "Наследие Диса",
+   "en": "Legacy of Dis",
+   "page": 23,
+   "desc": [
+    "Вы знаете заклинание «чудотворство». С 3 уровня раз в день можете наложить «маскировку», с 5 уровня так же — «обнаружение мыслей». Базовая характеристика — ХАР."
+   ],
+   "effects": [
+    {
+     "k": "spells",
+     "ability": "cha",
+     "uses": "longRest",
+     "spells": [
+      {
+       "spell": "thaumaturgy",
+       "level": 1
+      },
+      {
+       "spell": "disguise-self",
+       "level": 3
+      },
+      {
+       "spell": "detect-thoughts",
+       "level": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legacy-of-phlegethos",
+   "name": "Наследие Флегетоса",
+   "en": "Legacy of Phlegethos",
+   "page": 23,
+   "desc": [
+    "Вы знаете заклинание «дружба». С 3 уровня раз в день можете наложить «очарование личности» как заклинание 2 уровня, с 5 уровня так же — «внушение». Базовая характеристика — ХАР."
+   ],
+   "effects": [
+    {
+     "k": "spells",
+     "ability": "cha",
+     "uses": "longRest",
+     "note": "«очарование личности» — как заклинание 2 уровня",
+     "spells": [
+      {
+       "spell": "friends",
+       "level": 1
+      },
+      {
+       "spell": "charm-person",
+       "level": 3
+      },
+      {
+       "spell": "suggestion",
+       "level": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legacy-of-malbolge",
+   "name": "Наследие Малболга",
+   "en": "Legacy of Malbolge",
+   "page": 24,
+   "desc": [
+    "Вы знаете заклинание «малая иллюзия». С 3 уровня раз в день можете наложить «маскировку», с 5 уровня так же — «невидимость». Базовая характеристика — ХАР."
+   ],
+   "effects": [
+    {
+     "k": "spells",
+     "ability": "cha",
+     "uses": "longRest",
+     "spells": [
+      {
+       "spell": "minor-illusion",
+       "level": 1
+      },
+      {
+       "spell": "disguise-self",
+       "level": 3
+      },
+      {
+       "spell": "invisibility",
+       "level": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legacy-of-stygia",
+   "name": "Наследие Стигии",
+   "en": "Legacy of Stygia",
+   "page": 24,
+   "desc": [
+    "Вы знаете заклинание «луч холода». С 3 уровня раз в день можете наложить «доспех Агатиса» как заклинание 2 уровня, с 5 уровня так же — «тьму». Базовая характеристика — ХАР."
+   ],
+   "effects": [
+    {
+     "k": "spells",
+     "ability": "cha",
+     "uses": "longRest",
+     "note": "«доспех Агатиса» — как заклинание 2 уровня",
+     "spells": [
+      {
+       "spell": "ray-of-frost",
+       "level": 1
+      },
+      {
+       "spell": "armor-of-agathys",
+       "level": 3
+      },
+      {
+       "spell": "darkness",
+       "level": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legacy-of-minauros",
+   "name": "Наследие Минауроса",
+   "en": "Legacy of Minauros",
+   "page": 24,
+   "desc": [
+    "Вы знаете заклинание «волшебная рука». С 3 уровня раз в день можете наложить «парящий диск Тензера», с 5 уровня так же — «волшебный замок». Базовая характеристика — ХАР."
+   ],
+   "effects": [
+    {
+     "k": "spells",
+     "ability": "cha",
+     "uses": "longRest",
+     "spells": [
+      {
+       "spell": "mage-hand",
+       "level": 1
+      },
+      {
+       "spell": "floating-disk",
+       "level": 3
+      },
+      {
+       "spell": "arcane-lock",
+       "level": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legacy-of-cania",
+   "name": "Наследие Кании",
+   "en": "Legacy of Cania",
+   "page": 24,
+   "desc": [
+    "Вы знаете заклинание «волшебная рука». С 3 уровня раз в день можете наложить «огненные ладони» как заклинание 2 уровня, с 5 уровня так же — «горящий клинок». Базовая характеристика — ХАР."
+   ],
+   "effects": [
+    {
+     "k": "spells",
+     "ability": "cha",
+     "uses": "longRest",
+     "note": "«огненные ладони» — как заклинание 2 уровня",
+     "spells": [
+      {
+       "spell": "mage-hand",
+       "level": 1
+      },
+      {
+       "spell": "burning-hands",
+       "level": 3
+      },
+      {
+       "spell": "flame-blade",
+       "level": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "legacy-of-avernus",
+   "name": "Наследие Авернуса",
+   "en": "Legacy of Avernus",
+   "page": 25,
+   "desc": [
+    "Вы знаете заклинание «чудотворство». С 3 уровня раз в день можете наложить «палящую кару» как заклинание 2 уровня, с 5 уровня так же — «клеймящую кару». Базовая характеристика — ХАР."
+   ],
+   "effects": [
+    {
+     "k": "spells",
+     "ability": "cha",
+     "uses": "longRest",
+     "note": "«палящая кара» — как заклинание 2 уровня",
+     "spells": [
+      {
+       "spell": "thaumaturgy",
+       "level": 1
+      },
+      {
+       "spell": "searing-smite",
+       "level": 3
+      },
+      {
+       "spell": "branding-smite",
+       "level": 5
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

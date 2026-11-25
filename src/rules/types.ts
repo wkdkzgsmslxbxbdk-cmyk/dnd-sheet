@@ -166,6 +166,8 @@ export interface Subrace extends Translated {
   speed?: number | null;
   /** the race's ability bonuses don't apply (variant human) */
   replaceBonuses?: boolean;
+  /** base race traits this subrace replaces (half-elf variants, tiefling variants) */
+  removeTraits?: string[];
 }
 
 export interface Trait extends Translated {

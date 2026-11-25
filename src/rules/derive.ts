@@ -214,7 +214,8 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   const has = (id: string) => featureIds.has(id);
 
   // ---------- race traits ----------
-  const traitIds = [...(race?.traits ?? []), ...(subrace?.traits ?? [])];
+  const removed = new Set(subrace?.removeTraits ?? []);
+  const traitIds = [...(race?.traits ?? []).filter((t) => !removed.has(t)), ...(subrace?.traits ?? [])];
   const traits: Trait[] = [];
   const addTrait = (id: string) => {
     const t = cat.traits[id];
@@ -935,7 +936,10 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
     for (const lv of cls.levels.filter((l) => l.level <= e.level && l.features.some((f) => f.includes("ability-score-improvement")))) {
       if (!c.asi[`${e.classId}:${lv.level}`]) warnings.push({ level: "info", text: `Увеличение характеристик: ${cls.name} ${lv.level} уровня не распределено.` });
     }
-    const subLevel = cls.levels.find((l) => l.features.some((f) => cat.features[f] && cls.subclasses.length && /primal-path$|bard-college$|divine-domain$|druid-circle$|martial-archetype$|monastic-tradition$|sacred-oath$|ranger-archetype$|roguish-archetype$|sorcerous-origin$|otherworldly-patron$|arcane-tradition$/.test(f)))?.level;
+    // the level a subclass is chosen = the earliest level any of the class's subclasses grants a feature
+    const subLevel = cls.subclasses.length
+      ? Math.min(...cls.subclasses.map((s) => cat.subclasses[s]?.levels[0]?.level ?? 99))
+      : undefined;
     if (subLevel && e.level >= subLevel && !e.subclassId) warnings.push({ level: "info", text: `${cls.name}: на ${subLevel} уровне выбирается подкласс.` });
   }
   if (race?.bonusChoice && c.raceBonusChoice.length < race.bonusChoice.n) warnings.push({ level: "info", text: `${race.name}: выберите ${race.bonusChoice.n} характеристики для +${race.bonusChoice.bonus}.` });

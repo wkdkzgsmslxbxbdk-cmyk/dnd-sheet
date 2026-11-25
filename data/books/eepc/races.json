@@ -1,0 +1,102 @@
+{
+  "races": [
+    {
+      "id": "aarakocra", "name": "Ааракокра", "en": "Aarakocra", "page": 5, "speed": 25, "size": "Средний",
+      "bonuses": {"dex": 2, "wis": 1}, "languages": ["common"],
+      "traits": ["aarakocra-flight", "aarakocra-talons", "aarakocra-languages"],
+      "desc": ["Птицеподобный народ, умеющий летать. Играть за ааракокру можно только с разрешения Мастера.",
+               "Прибавки: ЛОВ +2, МДР +1. Средний размер (около 5 футов роста, вес 80-100 фунтов), скорость ходьбы 25 футов. Зрелость наступает к 3 годам, живут обычно не дольше 30 лет. Мировоззрение в основном доброе и нейтральное по оси «закон-хаос»."]
+    },
+    {
+      "id": "genasi", "name": "Дженази", "en": "Genasi", "page": 9, "speed": 30, "size": "Средний",
+      "bonuses": {"con": 2}, "languages": ["common", "primordial"],
+      "traits": [],
+      "desc": ["Потомки стихийных существ и смертных. Подраса выбирается из четырёх: воздух, земля, огонь, вода.",
+               "Прибавка: ТЕЛ +2 (плюс бонус подрасы). Средний размер (рост 5-6 футов), скорость ходьбы 30 футов. Взрослеют примерно как люди и живут около 120 лет. Мировоззрение обычно нейтральное."]
+    }
+  ],
+  "subraces": [
+    {
+      "id": "air-genasi", "race": "genasi", "name": "Дженази воздуха", "en": "Air Genasi", "page": 9,
+      "bonuses": {"dex": 1}, "traits": ["unending-breath", "mingle-with-the-wind"],
+      "desc": ["Потомки джиннов. Прибавка: ЛОВ +1. Могут бесконечно задерживать дыхание и раз в день левитировать."]
+    },
+    {
+      "id": "earth-genasi", "race": "genasi", "name": "Дженази земли", "en": "Earth Genasi", "page": 9,
+      "bonuses": {"str": 1}, "traits": ["earth-walk", "merge-with-stone"],
+      "desc": ["Потомки дао. Прибавка: СИЛ +1. Свободно движутся по каменистой труднопроходимой местности и раз в день накладывают «бесследное передвижение»."]
+    },
+    {
+      "id": "fire-genasi", "race": "genasi", "name": "Дженази огня", "en": "Fire Genasi", "page": 9,
+      "bonuses": {"int": 1}, "traits": ["darkvision", "fire-resistance-genasi", "reach-to-the-blaze"],
+      "desc": ["Потомки ифритов. Прибавка: ИНТ +1. Тёмное зрение, сопротивление огню, огненная магия."]
+    },
+    {
+      "id": "water-genasi", "race": "genasi", "name": "Дженази воды", "en": "Water Genasi", "page": 10,
+      "bonuses": {"wis": 1}, "traits": ["acid-resistance-genasi", "amphibious", "genasi-swimmer", "call-to-the-wave"],
+      "desc": ["Потомки маридов. Прибавка: МДР +1. Сопротивление кислоте, дыхание на суше и под водой, плавание, водная магия."]
+    }
+  ],
+  "traits": [
+    {
+      "id": "aarakocra-flight", "name": "Полёт", "en": "Flight", "page": 5,
+      "desc": ["Вы летаете со скоростью 50 футов. Для этого нельзя носить средний или тяжёлый доспех."],
+      "effects": [{"k": "speed", "mode": "fly", "value": 50, "set": true}]
+    },
+    {
+      "id": "aarakocra-talons", "name": "Когти", "en": "Talons", "page": 5,
+      "desc": ["Вы владеете безоружной атакой когтями: при попадании она наносит рубящий урон 1к4."]
+    },
+    {
+      "id": "aarakocra-languages", "name": "Языки ааракокры", "en": "Aarakocra Languages", "page": 5,
+      "desc": ["Вы говорите, читаете и пишете на Общем, Ауране и языке ааракокр. Языков Ауран и Ааракокр нет в списке приложения: отметьте их в заметках."]
+    },
+    {
+      "id": "unending-breath", "name": "Бесконечное дыхание", "en": "Unending Breath", "page": 9,
+      "desc": ["Пока вы дееспособны, вы можете задерживать дыхание на неограниченное время."]
+    },
+    {
+      "id": "mingle-with-the-wind", "name": "Общение с ветром", "en": "Mingle with the Wind", "page": 9,
+      "desc": ["Раз между продолжительными отдыхами вы можете наложить «левитацию» без материальных компонентов. Базовая характеристика — ТЕЛ."],
+      "effects": [{"k": "spells", "ability": "con", "uses": "longRest", "note": "без материальных компонентов", "spells": [{"spell": "levitate"}]}]
+    },
+    {
+      "id": "earth-walk", "name": "Хождение по земле", "en": "Earth Walk", "page": 9,
+      "desc": ["Вы перемещаетесь по труднопроходимой местности из земли или камня, не тратя на это лишнее движение."]
+    },
+    {
+      "id": "merge-with-stone", "name": "Слияние с камнем", "en": "Merge with Stone", "page": 9,
+      "desc": ["Раз между продолжительными отдыхами вы можете наложить «бесследное передвижение» без материальных компонентов. Базовая характеристика — ТЕЛ."],
+      "effects": [{"k": "spells", "ability": "con", "uses": "longRest", "note": "без материальных компонентов", "spells": [{"spell": "pass-without-trace"}]}]
+    },
+    {
+      "id": "fire-resistance-genasi", "name": "Сопротивление огню", "en": "Fire Resistance", "page": 10,
+      "desc": ["Вы получаете сопротивление урону огнём."],
+      "effects": [{"k": "resist", "types": ["fire"]}]
+    },
+    {
+      "id": "reach-to-the-blaze", "name": "Выброс пламени", "en": "Reach to the Blaze", "page": 10,
+      "desc": ["Вы знаете заговор «сотворение пламени». С 3 уровня раз между продолжительными отдыхами можете наложить «огненные ладони» как заклинание 1 уровня. Базовая характеристика — ТЕЛ."],
+      "effects": [{"k": "spells", "ability": "con", "uses": "longRest", "spells": [{"spell": "produce-flame", "level": 1}, {"spell": "burning-hands", "level": 3}]}]
+    },
+    {
+      "id": "acid-resistance-genasi", "name": "Сопротивление кислоте", "en": "Acid Resistance", "page": 10,
+      "desc": ["Вы получаете сопротивление урону кислотой."],
+      "effects": [{"k": "resist", "types": ["acid"]}]
+    },
+    {
+      "id": "amphibious", "name": "Амфибия", "en": "Amphibious", "page": 10,
+      "desc": ["Вы можете дышать как на суше, так и под водой."]
+    },
+    {
+      "id": "genasi-swimmer", "name": "Пловец", "en": "Swim", "page": 10,
+      "desc": ["Вы плаваете со скоростью 30 футов."],
+      "effects": [{"k": "speed", "mode": "swim", "value": 30, "set": true}]
+    },
+    {
+      "id": "call-to-the-wave", "name": "Призыв волны", "en": "Call to the Wave", "page": 10,
+      "desc": ["Вы знаете заговор «формование воды». С 3 уровня раз между продолжительными отдыхами можете наложить «сотворение или уничтожение воды» как заклинание 2 уровня. Базовая характеристика — ТЕЛ."],
+      "effects": [{"k": "spells", "ability": "con", "uses": "longRest", "note": "«сотворение или уничтожение воды» — как заклинание 2 уровня", "spells": [{"spell": "shape-water", "level": 1}, {"spell": "create-or-destroy-water", "level": 3}]}]
+    }
+  ]
+}

@@ -116,6 +116,44 @@ describe("PHB content", () => {
     expect(derive(make({ raceId: "elf", subraceId: "drow" })).senses.some((x) => x.range === 120)).toBe(true);
   });
 
+  it("Artificer: half caster rounded up; prepared = INT + half level", () => {
+    const c = make({
+      raceId: "human",
+      base: { str: 10, dex: 12, con: 14, int: 15, wis: 10, cha: 8 }, // INT 16
+      classes: [{ classId: "artificer", subclassId: null, level: 1, hpRolls: [] }],
+    });
+    let s = derive(c);
+    expect(s.slots[0]).toBe(2);
+    expect(s.casting[0].prepared?.value).toBe(3 + 0);
+    // artificer 3 (ceil 1.5 = 2) + wizard 1 = caster level 3 -> 4/2
+    c.classes = [
+      { classId: "artificer", subclassId: null, level: 3, hpRolls: [] },
+      { classId: "wizard", subclassId: null, level: 1, hpRolls: [] },
+    ];
+    s = derive(c);
+    expect(s.slots.slice(0, 2)).toEqual([4, 2]);
+  });
+
+  it("Bladesong adds INT to AC and 10 ft speed only while on", () => {
+    const c = make({
+      raceId: "elf", subraceId: "high-elf",
+      base: { str: 8, dex: 14, con: 12, int: 15, wis: 10, cha: 10 }, // DEX 16, INT 16
+      classes: [{ classId: "wizard", subclassId: "bladesinging", level: 2, hpRolls: [] }],
+    });
+    expect(derive(c).ac.value).toBe(13);
+    c.toggles = { bladesong: true };
+    const s = derive(c);
+    expect(s.ac.value).toBe(16);
+    expect(s.speed.value).toBe(40);
+  });
+
+  it("tiefling variants replace Infernal Legacy", () => {
+    const c = make({ raceId: "tiefling", subraceId: "zariel-tiefling", classes: [{ classId: "fighter", subclassId: null, level: 5, hpRolls: [] }] });
+    const s = derive(c);
+    expect(s.traits.some((t) => t.id === "infernal-legacy")).toBe(false);
+    expect(s.racialSpells.some((r) => r.spellId === "hellish-rebuke")).toBe(false);
+  });
+
   it("warlock patron spells only widen the list, domain spells are always prepared", () => {
     expect(catalog.subclasses.archfey.spellMode).toBe("expanded");
     expect(catalog.subclasses.light.spellMode).toBe("always");

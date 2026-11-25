@@ -1,0 +1,29 @@
+{
+  "classSpells": [
+    { "class": "bard", "spells": [
+      "command", "color-spray", "mirror-image", "aid", "enlarge-reduce", "slow", "intellect-fortress", "mass-healing-word",
+      "phantasmal-killer", "telepathic-bond", "heroes-feast", "prismatic-spray", "dream-of-the-blue-veil", "antipathy-sympathy", "prismatic-wall"] },
+    { "class": "cleric", "spells": [
+      "aura-of-vitality", "spirit-shroud", "aura-of-life", "aura-of-purity", "summon-celestial", "sunbeam", "sunburst", "power-word-heal"] },
+    { "class": "druid", "spells": [
+      "protection-from-evil-and-good", "continual-flame", "augury", "summon-beast", "enlarge-reduce", "aura-of-vitality", "revivify", "summon-fey",
+      "elemental-weapon", "fire-shield", "divination", "summon-elemental", "cone-of-cold", "flesh-to-stone", "symbol", "incendiary-cloud"] },
+    { "class": "paladin", "spells": [
+      "gentle-repose", "prayer-of-healing", "warding-bond", "spirit-shroud", "summon-celestial"] },
+    { "class": "ranger", "spells": [
+      "entangle", "searing-smite", "magic-weapon", "aid", "gust-of-wind", "summon-beast", "enhance-ability", "revivify", "meld-into-stone",
+      "elemental-weapon", "summon-fey", "dominate-beast", "summon-elemental", "greater-restoration"] },
+    { "class": "sorcerer", "spells": [
+      "sword-burst", "booming-blade", "green-flame-blade", "lightning-lure", "mind-sliver", "tashas-caustic-brew", "grease", "flame-blade",
+      "magic-weapon", "tashas-mind-whip", "flaming-sphere", "intellect-fortress", "vampiric-touch", "fire-shield", "arcane-hand", "flesh-to-stone",
+      "freezing-sphere", "tashas-otherworldly-guise", "dream-of-the-blue-veil", "demiplane", "blade-of-disaster"] },
+    { "class": "warlock", "spells": [
+      "sword-burst", "booming-blade", "green-flame-blade", "lightning-lure", "mind-sliver", "spirit-shroud", "intellect-fortress", "summon-undead",
+      "summon-shadowspawn", "summon-fey", "summon-aberration", "teleportation-circle", "planar-binding", "mislead", "summon-fiend",
+      "tashas-otherworldly-guise", "dream-of-the-blue-veil", "gate", "blade-of-disaster", "weird"] },
+    { "class": "wizard", "spells": [
+      "booming-blade", "green-flame-blade", "lightning-lure", "mind-sliver", "sword-burst", "tashas-caustic-brew", "augury", "tashas-mind-whip",
+      "enhance-ability", "intellect-fortress", "spirit-shroud", "summon-undead", "summon-shadowspawn", "summon-fey", "speak-with-dead", "divination",
+      "summon-aberration", "summon-construct", "summon-elemental", "tashas-otherworldly-guise", "summon-fiend", "dream-of-the-blue-veil", "blade-of-disaster"] }
+  ]
+}

@@ -1,0 +1,496 @@
+{
+ "subraces": [
+  {
+   "id": "duergar",
+   "race": "dwarf",
+   "name": "Серый дварф (дуэргар)",
+   "en": "Duergar",
+   "page": 105,
+   "bonuses": {
+    "str": 1
+   },
+   "traits": [
+    "superior-darkvision",
+    "duergar-language",
+    "duergar-resilience",
+    "duergar-magic",
+    "sunlight-sensitivity"
+   ],
+   "desc": [
+    "Подземные дварфы, ценящие тяжёлый труд и порядок. Играть дуэргаром нужно с разрешения Мастера. Прибавка: СИЛ +1. Получает все особенности дварфа и особенности подрасы."
+   ]
+  },
+  {
+   "id": "ghostwise-halfling",
+   "race": "halfling",
+   "name": "Призрачный полурослик",
+   "en": "Ghostwise Halfling",
+   "page": 111,
+   "bonuses": {
+    "wis": 1
+   },
+   "traits": [
+    "silent-speech"
+   ],
+   "desc": [
+    "Редкая подраса полуросликов из Чондалвуда, живущая замкнутыми кланами. Играть ей нужно с разрешения Мастера. Прибавка: МДР +1."
+   ]
+  },
+  {
+   "id": "deep-gnome",
+   "race": "gnome",
+   "name": "Глубинный гном (свирфнеблин)",
+   "en": "Deep Gnome (Svirfneblin)",
+   "page": 116,
+   "bonuses": {
+    "dex": 1
+   },
+   "traits": [
+    "superior-darkvision",
+    "stone-camouflage",
+    "deep-gnome-language"
+   ],
+   "desc": [
+    "Мрачные и скрытные гномы Подземья. Прибавка: ЛОВ +1 (вместо бонуса лесного или скального гнома). Склонны к нейтральному мировоззрению, весят 80-120 фунтов, взрослеют к 25 годам и живут 200-250 лет."
+   ]
+  },
+  {
+   "id": "half-elf-keen-senses",
+   "race": "half-elf",
+   "name": "Полуэльф: острые чувства",
+   "en": "Half-Elf Variant: Keen Senses",
+   "page": 117,
+   "bonuses": {},
+   "traits": [
+    "keen-senses"
+   ],
+   "desc": [
+    "Вариант полуэльфа Забытых Королевств: вместо «Универсальности навыков» берётся эльфийская особенность «Острые чувства». Выбирайте этот вариант только с разрешения Мастера и не берите «Универсальность навыков» (она остаётся в списке особенностей расы, игнорируйте её)."
+   ],
+   "removeTraits": [
+    "skill-versatility"
+   ]
+  },
+  {
+   "id": "half-elf-wood-weapon-training",
+   "race": "half-elf",
+   "name": "Полуэльф лесного происхождения: владение оружием",
+   "en": "Half-Elf Variant (Wood Elf): Weapon Training",
+   "page": 117,
+   "bonuses": {},
+   "traits": [
+    "elf-weapon-training"
+   ],
+   "desc": [
+    "Вариант полуэльфа с лесным эльфийским наследием: вместо «Универсальности навыков» берётся «Владение эльфийским оружием» (игнорируйте «Универсальность навыков»)."
+   ],
+   "removeTraits": [
+    "skill-versatility"
+   ]
+  },
+  {
+   "id": "half-elf-wood-fleet-of-foot",
+   "race": "half-elf",
+   "name": "Полуэльф лесного происхождения: быстрые ноги",
+   "en": "Half-Elf Variant (Wood Elf): Fleet of Foot",
+   "page": 117,
+   "bonuses": {},
+   "speed": 35,
+   "traits": [
+    "fleet-of-foot"
+   ],
+   "desc": [
+    "Вариант полуэльфа с лесным эльфийским наследием: вместо «Универсальности навыков» берутся «Быстрые ноги» (скорость ходьбы 35 футов)."
+   ],
+   "removeTraits": [
+    "skill-versatility"
+   ]
+  },
+  {
+   "id": "half-elf-wood-mask-of-the-wild",
+   "race": "half-elf",
+   "name": "Полуэльф лесного происхождения: маскировка",
+   "en": "Half-Elf Variant (Wood Elf): Mask of the Wild",
+   "page": 117,
+   "bonuses": {},
+   "traits": [
+    "mask-of-the-wild"
+   ],
+   "desc": [
+    "Вариант полуэльфа с лесным эльфийским наследием: вместо «Универсальности навыков» берётся «Маскировка в дикой местности»."
+   ],
+   "removeTraits": [
+    "skill-versatility"
+   ]
+  },
+  {
+   "id": "half-elf-moon-weapon-training",
+   "race": "half-elf",
+   "name": "Полуэльф лунного или солнечного происхождения: владение оружием",
+   "en": "Half-Elf Variant (Moon/Sun Elf): Weapon Training",
+   "page": 117,
+   "bonuses": {},
+   "traits": [
+    "elf-weapon-training"
+   ],
+   "desc": [
+    "Вариант полуэльфа с лунным или солнечным эльфийским наследием: вместо «Универсальности навыков» берётся «Владение эльфийским оружием»."
+   ],
+   "removeTraits": [
+    "skill-versatility"
+   ]
+  },
+  {
+   "id": "half-elf-moon-cantrip",
+   "race": "half-elf",
+   "name": "Полуэльф лунного или солнечного происхождения: заговор",
+   "en": "Half-Elf Variant (Moon/Sun Elf): Cantrip",
+   "page": 117,
+   "bonuses": {},
+   "traits": [
+    "high-elf-cantrip"
+   ],
+   "desc": [
+    "Вариант полуэльфа с лунным или солнечным эльфийским наследием: вместо «Универсальности навыков» берётся «Заговор» высшего эльфа (один заговор волшебника)."
+   ],
+   "removeTraits": [
+    "skill-versatility"
+   ]
+  },
+  {
+   "id": "half-elf-drow",
+   "race": "half-elf",
+   "name": "Полуэльф происхождения дроу",
+   "en": "Half-Elf Variant (Drow)",
+   "page": 117,
+   "bonuses": {},
+   "traits": [
+    "drow-magic"
+   ],
+   "desc": [
+    "Вариант полуэльфа с наследием дроу: вместо «Универсальности навыков» берётся «Магия дроу»."
+   ],
+   "removeTraits": [
+    "skill-versatility"
+   ]
+  },
+  {
+   "id": "half-elf-aquatic",
+   "race": "half-elf",
+   "name": "Полуэльф водного происхождения",
+   "en": "Half-Elf Variant (Aquatic Elf)",
+   "page": 117,
+   "bonuses": {},
+   "traits": [
+    "half-elf-swim-speed"
+   ],
+   "desc": [
+    "Вариант полуэльфа с наследием водных эльфов: вместо «Универсальности навыков» вы получаете скорость плавания 30 футов."
+   ],
+   "removeTraits": [
+    "skill-versatility"
+   ]
+  },
+  {
+   "id": "tiefling-feral",
+   "race": "tiefling",
+   "name": "Тифлинг: звероподобный",
+   "en": "Tiefling Variant: Feral",
+   "page": 119,
+   "bonuses": {
+    "int": 1,
+    "dex": 2
+   },
+   "replaceBonuses": true,
+   "traits": [],
+   "desc": [
+    "Вариант тифлинга: вместо обычных прибавок характеристик — ИНТ +1 и ЛОВ +2."
+   ]
+  },
+  {
+   "id": "tiefling-devils-tongue",
+   "race": "tiefling",
+   "name": "Тифлинг: дьявольский язык",
+   "en": "Tiefling Variant: Devil's Tongue",
+   "page": 119,
+   "bonuses": {},
+   "traits": [
+    "devils-tongue"
+   ],
+   "desc": [
+    "Вариант тифлинга: вместо «Инфернального наследия» вы получаете другую магию (в списке особенностей расы «Инфернальное наследие» остаётся, игнорируйте её). Взаимоисключающие варианты: «Дьявольский язык», «Адское пламя», «Крылатый»."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  },
+  {
+   "id": "tiefling-hellfire",
+   "race": "tiefling",
+   "name": "Тифлинг: адское пламя",
+   "en": "Tiefling Variant: Hellfire",
+   "page": 119,
+   "bonuses": {},
+   "traits": [
+    "hellfire"
+   ],
+   "desc": [
+    "Вариант тифлинга: «Адское пламя» заменяет заклинание «адское возмездие» из «Инфернального наследия» на «огненные ладони»."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  },
+  {
+   "id": "tiefling-winged",
+   "race": "tiefling",
+   "name": "Тифлинг: крылатый",
+   "en": "Tiefling Variant: Winged",
+   "page": 119,
+   "bonuses": {},
+   "traits": [
+    "tiefling-winged"
+   ],
+   "desc": [
+    "Вариант тифлинга: перепончатые крылья вместо «Инфернального наследия» (игнорируйте его в списке особенностей расы)."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  },
+  {
+   "id": "tiefling-feral-devils-tongue",
+   "race": "tiefling",
+   "name": "Тифлинг: звероподобный + дьявольский язык",
+   "en": "Tiefling Variant: Feral + Devil's Tongue",
+   "page": 119,
+   "bonuses": {
+    "int": 1,
+    "dex": 2
+   },
+   "replaceBonuses": true,
+   "traits": [
+    "devils-tongue"
+   ],
+   "desc": [
+    "Сочетание двух вариантов тифлинга: прибавки ИНТ +1 и ЛОВ +2 вместо обычных, плюс магия «Дьявольского языка»."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  },
+  {
+   "id": "tiefling-feral-hellfire",
+   "race": "tiefling",
+   "name": "Тифлинг: звероподобный + адское пламя",
+   "en": "Tiefling Variant: Feral + Hellfire",
+   "page": 119,
+   "bonuses": {
+    "int": 1,
+    "dex": 2
+   },
+   "replaceBonuses": true,
+   "traits": [
+    "hellfire"
+   ],
+   "desc": [
+    "Сочетание двух вариантов тифлинга: прибавки ИНТ +1 и ЛОВ +2 вместо обычных, плюс «Адское пламя»."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  },
+  {
+   "id": "tiefling-feral-winged",
+   "race": "tiefling",
+   "name": "Тифлинг: звероподобный + крылатый",
+   "en": "Tiefling Variant: Feral + Winged",
+   "page": 119,
+   "bonuses": {
+    "int": 1,
+    "dex": 2
+   },
+   "replaceBonuses": true,
+   "traits": [
+    "tiefling-winged"
+   ],
+   "desc": [
+    "Сочетание двух вариантов тифлинга: прибавки ИНТ +1 и ЛОВ +2 вместо обычных, плюс крылья."
+   ],
+   "removeTraits": [
+    "infernal-legacy"
+   ]
+  }
+ ],
+ "traits": [
+  {
+   "id": "duergar-language",
+   "name": "Дополнительный язык",
+   "en": "Extra Language",
+   "page": 105,
+   "desc": [
+    "Вы говорите, читаете и пишете на Нижнеобщем (в списке языков приложения он называется «Подземный общий»)."
+   ]
+  },
+  {
+   "id": "duergar-resilience",
+   "name": "Дуэргарская стойкость",
+   "en": "Duergar Resilience",
+   "page": 105,
+   "desc": [
+    "Вы совершаете спасброски от иллюзий, а также от очарования и паралича с преимуществом."
+   ]
+  },
+  {
+   "id": "duergar-magic",
+   "name": "Магия дуэргаров",
+   "en": "Duergar Magic",
+   "page": 105,
+   "desc": [
+    "С 3 уровня вы можете раз между продолжительными отдыхами наложить на себя «увеличение» (только вариант увеличения), с 5 уровня — так же раз «невидимость». Материальные компоненты не нужны. Под прямым солнечным светом эти способности недоступны, но уже сработавшее заклинание от солнца не страдает. Базовая характеристика — ИНТ."
+   ],
+   "effects": [
+    {
+     "k": "spells",
+     "ability": "int",
+     "uses": "longRest",
+     "note": "без материальных компонентов; «увеличение» — только в сторону увеличения; недоступно под прямым солнцем",
+     "spells": [
+      {
+       "spell": "enlarge-reduce",
+       "level": 3
+      },
+      {
+       "spell": "invisibility",
+       "level": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "silent-speech",
+   "name": "Бесшумная речь",
+   "en": "Silent Speech",
+   "page": 111,
+   "desc": [
+    "Вы можете телепатически общаться с одним существом за раз в пределах 30 футов. Оно поймёт вас, только если у вас есть общий язык."
+   ]
+  },
+  {
+   "id": "stone-camouflage",
+   "name": "Каменный камуфляж",
+   "en": "Stone Camouflage",
+   "page": 116,
+   "desc": [
+    "Вы совершаете проверки ЛОВ (Скрытность), чтобы спрятаться в каменистой местности, с преимуществом."
+   ]
+  },
+  {
+   "id": "deep-gnome-language",
+   "name": "Дополнительный язык",
+   "en": "Extra Language",
+   "page": 116,
+   "desc": [
+    "Вы говорите, читаете и пишете на Нижнеобщем (в списке приложения — «Подземный общий»)."
+   ]
+  },
+  {
+   "id": "half-elf-swim-speed",
+   "name": "Скорость плавания 30 футов",
+   "en": "Swim Speed",
+   "page": 117,
+   "desc": [
+    "Вы плаваете со скоростью 30 футов."
+   ],
+   "effects": [
+    {
+     "k": "speed",
+     "mode": "swim",
+     "value": 30,
+     "set": true
+    }
+   ]
+  },
+  {
+   "id": "devils-tongue",
+   "name": "Дьявольский язык",
+   "en": "Devil's Tongue",
+   "page": 119,
+   "desc": [
+    "Вы знаете заговор «злая насмешка». С 3 уровня раз между продолжительными отдыхами можете наложить «очарование личности» как заклинание 2 уровня, с 5 уровня так же раз — «речь златоуста». Базовая характеристика — ХАР. Заменяет «Инфернальное наследие»."
+   ],
+   "effects": [
+    {
+     "k": "spells",
+     "ability": "cha",
+     "uses": "longRest",
+     "note": "«очарование личности» — как заклинание 2 уровня",
+     "spells": [
+      {
+       "spell": "vicious-mockery",
+       "level": 1
+      },
+      {
+       "spell": "charm-person",
+       "level": 3
+      },
+      {
+       "spell": "enthrall",
+       "level": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hellfire",
+   "name": "Адское пламя",
+   "en": "Hellfire",
+   "page": 119,
+   "desc": [
+    "С 3 уровня вы можете раз между продолжительными отдыхами наложить «огненные ладони» как заклинание 2 уровня. Заменяет заклинание «адское возмездие» из «Инфернального наследия». Базовая характеристика — ХАР."
+   ],
+   "effects": [
+    {
+     "k": "spells",
+     "ability": "cha",
+     "uses": "longRest",
+     "note": "адские руки — как заклинание 2 уровня",
+     "spells": [
+      {
+       "spell": "thaumaturgy",
+       "level": 1
+      },
+      {
+       "spell": "burning-hands",
+       "level": 3
+      },
+      {
+       "spell": "darkness",
+       "level": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tiefling-winged",
+   "name": "Крылатый",
+   "en": "Winged",
+   "page": 119,
+   "desc": [
+    "У вас вырастают перепончатые крылья: скорость полёта 30 футов, пока вы не носите тяжёлый доспех. Заменяет «Инфернальное наследие»."
+   ],
+   "effects": [
+    {
+     "k": "speed",
+     "mode": "fly",
+     "value": 30,
+     "set": true,
+     "armor": "notHeavy"
+    }
+   ]
+  }
+ ]
+}

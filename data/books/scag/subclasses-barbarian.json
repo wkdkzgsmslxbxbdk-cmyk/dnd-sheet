@@ -1,0 +1,51 @@
+{
+  "subclasses": [
+    {
+      "id": "battlerager", "class": "barbarian", "name": "Путь бушующего в бою", "en": "Path of the Battlerager",
+      "flavor": "Путь дикости", "page": 122,
+      "desc": ["Дварфийский путь, по которому идут последователи богов войны. Варвар сражается в шипованных доспехах и превращает собственное тело в оружие.",
+               "Ограничение: путь доступен только дварфам (в Забытых Королевствах); Мастер может снять это ограничение."],
+      "spells": [], "spellMode": "always",
+      "features": [
+        { "id": "battlerager-armor", "level": 3, "name": "Броня бушующего в бою", "en": "Battlerager Armor", "page": 122,
+          "desc": ["Шипованный доспех становится вашим оружием. Шипованный доспех — редкий средний доспех дварфов: стоит 75 зм, КД 14 + модификатор ЛОВ (не более +2), помеха на Скрытность, весит 45 фунтов.",
+                   "Пока вы в ярости и в шипованном доспехе, вы можете бонусным действием совершить рукопашную атаку шипами по цели в 5 футах. При попадании она получает колющий урон 1к4; для атаки и урона используется модификатор СИЛ.",
+                   "Кроме того, если вы действием Атаки хватаете существо и проверка захвата успешна, цель получает 3 колющего урона."] },
+        { "id": "battlerager-reckless-abandon", "level": 6, "name": "Полное безрассудство", "en": "Reckless Abandon", "page": 122,
+          "desc": ["Когда в ярости вы используете Безрассудную атаку, вы получаете временные хиты, равные модификатору ТЕЛ (минимум 1). Оставшиеся временные хиты пропадают, когда ярость заканчивается."] },
+        { "id": "battlerager-charge", "level": 10, "name": "Налёт бушующего в бою", "en": "Battlerager Charge", "page": 122,
+          "desc": ["Пока вы в ярости, вы можете совершать действие Рывок бонусным действием."] },
+        { "id": "battlerager-spiked-retribution", "level": 14, "name": "Шипованная расплата", "en": "Spiked Retribution", "page": 122,
+          "desc": ["Если вы в ярости, дееспособны и носите шипованный доспех, а существо в 5 футах попадает по вам рукопашной атакой, оно получает 3 колющего урона."] }
+      ]
+    }
+  ],
+  "features": [
+    { "id": "totem-warrior-totem-spirit-elk", "class": "barbarian", "subclass": "totem-warrior", "level": 3,
+      "name": "Тотемный дух: лось", "en": "Totem Spirit: Elk", "page": 123,
+      "desc": ["Пока вы в ярости и не носите тяжёлый доспех, ваша скорость ходьбы увеличивается на 15 футов."],
+      "effects": [{ "k": "speed", "value": 15, "when": "rage", "armor": "notHeavy" }],
+      "addTo": ["totem-warrior-totem-spirit"] },
+    { "id": "totem-warrior-totem-spirit-tiger", "class": "barbarian", "subclass": "totem-warrior", "level": 3,
+      "name": "Тотемный дух: тигр", "en": "Totem Spirit: Tiger", "page": 123,
+      "desc": ["Пока вы в ярости, ваш прыжок в длину увеличивается на 10 футов, а прыжок в высоту — на 3 фута."],
+      "addTo": ["totem-warrior-totem-spirit"] },
+    { "id": "totem-warrior-aspect-of-the-beast-elk", "class": "barbarian", "subclass": "totem-warrior", "level": 6,
+      "name": "Аспект зверя: лось", "en": "Aspect of the Beast: Elk", "page": 123,
+      "desc": ["Пешком или верхом ваша скорость путешествия удваивается. То же получают до 10 спутников в пределах 60 футов от вас, пока вы дееспособны."],
+      "addTo": ["totem-warrior-aspect-of-the-beast"] },
+    { "id": "totem-warrior-aspect-of-the-beast-tiger", "class": "barbarian", "subclass": "totem-warrior", "level": 6,
+      "name": "Аспект зверя: тигр", "en": "Aspect of the Beast: Tiger", "page": 123,
+      "desc": ["Вы получаете владение одним навыком на выбор: Атлетика, Акробатика, Скрытность или Выживание."],
+      "effects": [{ "k": "skillChoice", "n": 1, "from": ["athletics", "acrobatics", "stealth", "survival"] }],
+      "addTo": ["totem-warrior-aspect-of-the-beast"] },
+    { "id": "totem-warrior-totemic-attunement-elk", "class": "barbarian", "subclass": "totem-warrior", "level": 14,
+      "name": "Гармония тотема: лось", "en": "Totemic Attunement: Elk", "page": 123,
+      "desc": ["Пока вы в ярости, вы можете во время движения потратить бонусное действие, чтобы пройти через пространство существа размера Большой или меньше. Оно проходит спасбросок СИЛ (Сл 8 + модификатор СИЛ + бонус мастерства); при провале оно сбито с ног и получает дробящий урон 1к12 + модификатор СИЛ."],
+      "addTo": ["totem-warrior-totemic-attunement"] },
+    { "id": "totem-warrior-totemic-attunement-tiger", "class": "barbarian", "subclass": "totem-warrior", "level": 14,
+      "name": "Гармония тотема: тигр", "en": "Totemic Attunement: Tiger", "page": 123,
+      "desc": ["Пока вы в ярости, если вы прошли хотя бы 20 футов по прямой к существу размера Большой или меньше и затем собираетесь атаковать его рукопашным оружием, вы можете бонусным действием совершить по нему ещё одну рукопашную атаку."],
+      "addTo": ["totem-warrior-totemic-attunement"] }
+  ]
+}
