@@ -1,0 +1,77 @@
+{
+  "subclasses": [
+    {
+      "id": "shadow", "class": "monk", "name": "Путь тени", "en": "Way of Shadow",
+      "flavor": "Монастырская традиция", "page": 80,
+      "desc": ["Традиция скрытности и обмана: монахи-шпионы и тайные убийцы, которых зовут ниндзя или теневыми танцорами."],
+      "spells": [], "spellMode": "always",
+      "features": [
+        { "id": "shadow-shadow-arts", "level": 3, "name": "Техника тени", "en": "Shadow Arts", "page": 81,
+          "desc": ["Действием вы можете потратить 2 очка ци и сотворить одно из заклинаний: бесследное передвижение, тёмное зрение, тишина или тьма — без материальных компонентов.",
+                   "Кроме того, вы получаете заговор малая иллюзия, если ещё не знали его."],
+          "effects": [{ "k": "spells", "spells": [{ "spell": "minor-illusion", "level": 3 }], "ability": "wis", "note": "заговор от Техники тени; заклинания за очки ци (бесследное передвижение, тёмное зрение, тишина, тьма) — по 2 очка ци" }] },
+        { "id": "shadow-shadow-step", "level": 6, "name": "Шаг тени", "en": "Shadow Step", "page": 81,
+          "desc": ["Стоя в тусклом свете или темноте, вы можете бонусным действием перенестись на 60 футов в иное видимое вам тёмное или тускло освещённое место. Первая рукопашная атака, которую вы совершите до конца этого хода, идёт с преимуществом."] },
+        { "id": "shadow-cloak-of-shadows", "level": 11, "name": "Плащ теней", "en": "Cloak of Shadows", "page": 81,
+          "desc": ["В тусклом свете или темноте вы можете действием стать невидимым. Невидимость держится, пока вы не атакуете, не наложите заклинание или не окажетесь на ярком свету."] },
+        { "id": "shadow-opportunist", "level": 17, "name": "Оппортунист", "en": "Opportunist", "page": 81,
+          "desc": ["Когда другое существо (не вы) попадает атакой по существу в пределах 5 футов от вас, вы можете реакцией совершить по тому существу рукопашную атаку."] }
+      ]
+    },
+    {
+      "id": "four-elements", "class": "monk", "name": "Путь четырёх стихий", "en": "Way of the Four Elements",
+      "flavor": "Монастырская традиция", "page": 80,
+      "desc": ["Традиция, учащая управлять четырьмя стихиями с помощью ци; практики стихий тратят очки ци."],
+      "spells": [], "spellMode": "always",
+      "features": [
+        { "id": "four-elements-elemental-adept", "level": 3, "name": "Адепт стихий", "en": "Disciple of the Elements", "page": 81,
+          "desc": ["Вы изучаете практики стихий, требующие очков ци. Обязательная практика — Родство со стихией, плюс одна любая; ещё по одной добавляется на 6, 11 и 17 уровнях. Изучая новую, можно заменить ранее известную. Если у практики указан уровень, его нужно достичь.",
+                   "Заклинания практик накладываются обычным временем накладывания и без материальных компонентов.",
+                   "С 5 уровня вы можете тратить дополнительные очки ци, чтобы усилить такие заклинания, если они усиливаются ячейками более высокого уровня: каждое дополнительное очко повышает уровень заклинания на 1. Максимум очков ци на одно заклинание (включая базовую стоимость): 3 на уровнях монаха 5–8, 4 на 9–12, 5 на 13–16, 6 на 17–20."] },
+        { "id": "four-elements-disciplines", "level": 3, "name": "Стихийные практики", "en": "Elemental Disciplines", "page": 81,
+          "desc": ["Выбор практик стихий. Всего изучено: 2 на 3 уровне, 3 на 6, 4 на 11, 5 на 17 уровне монаха."],
+          "choice": { "kind": "feature", "n": { "3": 2, "6": 3, "11": 4, "17": 5 }, "options": [] } }
+      ]
+    }
+  ],
+  "features": [
+    { "id": "discipline-water-whip", "class": "monk", "subclass": "four-elements", "level": 3, "name": "Водяной кнут", "en": "Water Whip", "page": 81,
+      "desc": ["Действием за 2 очка ци выберите видимое существо в пределах 30 футов: оно делает спасбросок Ловкости. При провале получает дробящий урон 3к10 (+1к10 за каждое дополнительное очко ци), и вы либо сбиваете его с ног, либо подтягиваете на 25 футов к себе. При успехе — половина урона, без подтягивания и без падения."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-gong-of-the-summit", "class": "monk", "subclass": "four-elements", "level": 6, "name": "Гонг на вершине горы", "en": "Gong of the Summit", "page": 81,
+      "desc": ["Требуется 6 уровень. За 3 очка ци вы накладываете заклинание дребезги."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-breath-of-winter", "class": "monk", "subclass": "four-elements", "level": 17, "name": "Дыхание зимы", "en": "Breath of Winter", "page": 82,
+      "desc": ["Требуется 17 уровень. За 6 очков ци вы накладываете заклинание конус холода."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-wave-of-rolling-earth", "class": "monk", "subclass": "four-elements", "level": 17, "name": "Земляной вал", "en": "Wave of Rolling Earth", "page": 82,
+      "desc": ["Требуется 17 уровень. За 6 очков ци вы накладываете заклинание каменная стена."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-fangs-of-the-fire-snake", "class": "monk", "subclass": "four-elements", "level": 3, "name": "Зубы огненной змеи", "en": "Fangs of the Fire Snake", "page": 82,
+      "desc": ["Совершая в свой ход действие Атака, вы можете потратить 1 очко ци: для этой и последующих атак текущего хода досягаемость ваших безоружных атак растёт на 10 футов, они наносят урон огнём вместо дробящего, а при попадании можно потратить ещё 1 очко ци и добавить к урону этой атаки 1к10 урона огнём."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-sweeping-cinder-strike", "class": "monk", "subclass": "four-elements", "level": 3, "name": "Испепеляющий удар", "en": "Sweeping Cinder Strike", "page": 82,
+      "desc": ["За 2 очка ци вы накладываете заклинание огненные ладони."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-fist-of-four-thunders", "class": "monk", "subclass": "four-elements", "level": 3, "name": "Кулак четырёх громов", "en": "Fist of Four Thunders", "page": 82,
+      "desc": ["За 2 очка ци вы накладываете заклинание волна грома."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-rush-of-the-gale-spirits", "class": "monk", "subclass": "four-elements", "level": 3, "name": "Натиск штормовых духов", "en": "Rush of the Gale Spirits", "page": 82,
+      "desc": ["За 2 очка ци вы накладываете заклинание порыв ветра."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-fist-of-unbroken-air", "class": "monk", "subclass": "four-elements", "level": 3, "name": "Несокрушимый воздушный кулак", "en": "Fist of Unbroken Air", "page": 82,
+      "desc": ["Действием за 2 очка ци выберите существо в пределах 30 футов: оно делает спасбросок Силы. При провале получает дробящий урон 3к10 (+1к10 за каждое дополнительное очко ци), вы можете отбросить его на 20 футов от себя и сбить с ног. При успехе — половина урона, без отбрасывания и падения."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-clench-of-the-north-wind", "class": "monk", "subclass": "four-elements", "level": 6, "name": "Объятья северного ветра", "en": "Clench of the North Wind", "page": 82,
+      "desc": ["Требуется 6 уровень. За 3 очка ци вы накладываете заклинание удержание личности."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-ride-the-wind", "class": "monk", "subclass": "four-elements", "level": 11, "name": "Осёдланный ветер", "en": "Ride the Wind", "page": 82,
+      "desc": ["Требуется 11 уровень. За 4 очка ци вы накладываете на себя заклинание полёт."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-flames-of-the-phoenix", "class": "monk", "subclass": "four-elements", "level": 11, "name": "Пламя феникса", "en": "Flames of the Phoenix", "page": 82,
+      "desc": ["Требуется 11 уровень. За 4 очка ци вы накладываете заклинание огненный шар."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-eternal-mountain-defense", "class": "monk", "subclass": "four-elements", "level": 17, "name": "Прочность вечных гор", "en": "Eternal Mountain Defense", "page": 82,
+      "desc": ["Требуется 17 уровень. За 5 очков ци вы накладываете на себя заклинание каменная кожа."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-river-of-hungry-flame", "class": "monk", "subclass": "four-elements", "level": 17, "name": "Река голодного пламени", "en": "River of Hungry Flame", "page": 82,
+      "desc": ["Требуется 17 уровень. За 5 очков ци вы накладываете заклинание огненная стена."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-elemental-attunement", "class": "monk", "subclass": "four-elements", "level": 3, "name": "Родство со стихией", "en": "Elemental Attunement", "page": 82,
+      "desc": ["Действием вы ненадолго берёте под контроль близкие стихийные силы и выбираете один эффект:",
+               "• безвредный мгновенный эффект воды, воздуха, земли или огня (сноп искр, дуновение ветра, струйка тумана, гул камня);",
+               "• мгновенно зажечь или погасить свечу, факел или небольшой костёр;",
+               "• охладить или нагреть до 1 фунта неживой материи на срок до 1 часа;",
+               "• придать воде, воздуху, земле или огню объёмом до куба с ребром 1 фут выбранную грубую форму на 1 минуту."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-mist-stance", "class": "monk", "subclass": "four-elements", "level": 11, "name": "Туманная стойка", "en": "Mist Stance", "page": 82,
+      "desc": ["Требуется 11 уровень. За 4 очка ци вы накладываете на себя заклинание газообразная форма."], "addTo": ["four-elements-disciplines"] },
+    { "id": "discipline-shape-the-flowing-river", "class": "monk", "subclass": "four-elements", "level": 3, "name": "Формирование текущей реки", "en": "Shape the Flowing River", "page": 82,
+      "desc": ["Действием за 1 очко ци выберите область льда или воды со стороной не более 30 футов в пределах 120 футов. Вы можете превращать в ней воду в лёд и обратно и придавать льду любую форму: поднимать или опускать уровень, создавать или засыпать углубление, возводить или сравнивать стену, ставить ледяной столб. Любое изменение не больше половины наибольшей стороны области (для области 30 футов — до 15 футов). Нельзя заключить существо в лёд или нанести урон этим эффектом."], "addTo": ["four-elements-disciplines"] }
+  ]
+}

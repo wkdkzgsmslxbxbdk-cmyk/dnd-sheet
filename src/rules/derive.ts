@@ -5,7 +5,8 @@
 import { catalog as defaultCatalog, type Catalog } from "../data/catalog";
 import type { Character, InvItem } from "./character";
 import { totalLevel } from "./character";
-import { ABILITIES, type Ability, type Equipment, type Feature, type MagicItem, type Trait } from "./types";
+import { ABILITIES, type Ability, type Equipment, type Feat, type Feature, type MagicItem, type Trait } from "./types";
+import { choiceKey, countAt, dieAt, evalExpr, type Effect, type EffectOwner, type Expr } from "./effects";
 import { ITEM_BASE_WEAPON, ITEM_EFFECTS, type ItemMod } from "./itemEffects";
 import { add, dice, flat, formatDice, parseDice, type DiceExpr } from "./dice";
 
@@ -49,6 +50,8 @@ export interface SpellcastingInfo {
   /** highest spell level this class can learn/prepare */
   maxLevel: number;
   pact: boolean;
+  /** class spell list the spells come from (Eldritch Knight learns wizard spells); null = granted spells only */
+  list: string | null;
 }
 
 export interface Resource {
@@ -82,6 +85,8 @@ export interface AttackInfo {
 
 export interface RacialSpell {
   spellId: string;
+  /** caster entry it is cast with ("race" or "owner:<id>") */
+  classId?: string;
   note: string;
   /** cast at this slot level without using a slot */
   fixedSlot?: number;
@@ -125,6 +130,19 @@ export interface Sheet {
   critFrom: number;
   /** Brutal Critical extra dice (barbarian level based) */
   brutalDice: number;
+  /** save DCs of features (maneuvers, ki...) */
+  dcs: { name: string; source: string; calc: Calc }[];
+  /** on/off states features define (Bladesong...) */
+  toggles: { id: string; name: string; source: string }[];
+  otherSpeeds: Record<string, number>;
+  resists: string[];
+  senses: { name: string; range: number }[];
+  feats: Feat[];
+  owners: EffectOwner[];
+  expertise: string[];
+  effectLanguages: string[];
+  /** spell-affecting effects for spellcalc, with the owner's expression variables */
+  spellEffects: { e: Effect; owner: string; vars: Record<string, number> }[];
   sneakAttack: string | null;
   rageDamage: number;
   warnings: Warning[];
@@ -190,6 +208,37 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   traitIds.forEach(addTrait);
   const hasTrait = (id: string) => traits.some((t) => t.id === id);
 
+  // ---------- effect owners (book content: features, traits, feats, background) ----------
+  const owners: EffectOwner[] = [];
+  for (const af of features) if (af.feature.effects?.length) owners.push({ id: af.feature.id, name: af.feature.name, classId: af.classId, effects: af.feature.effects });
+  for (const t of traits) if (t.effects?.length) owners.push({ id: t.id, name: t.name, effects: t.effects });
+  if (background?.effects?.length) owners.push({ id: background.id, name: background.name, effects: background.effects });
+  const feats: Feat[] = [];
+  const addFeat = (id: string) => {
+    const f = cat.feats[id];
+    if (!f || feats.includes(f)) return;
+    feats.push(f);
+    owners.push({ id: `feat:${f.id}`, name: f.name, effects: f.effects ?? [] });
+  };
+  for (const [key, ch] of Object.entries(c.asi)) {
+    const [classId, lvStr] = key.split(":");
+    if (ch.kind === "feat" && classLevel(classId) >= Number(lvStr)) addFeat(ch.featId);
+  }
+  // feats granted by a choice (variant human); owners grows while we scan
+  for (let i = 0; i < owners.length; i++)
+    owners[i].effects.forEach((e, j) => {
+      if (e.k === "featChoice") for (const fid of c.choices[choiceKey(owners[i].id, j)] ?? []) addFeat(fid);
+    });
+  /** active effects of one kind, with their owner and index (toggled effects only while on) */
+  const effs = <K extends Effect["k"]>(k: K) =>
+    owners.flatMap((o) =>
+      o.effects
+        .map((e, i) => ({ o, e: e as Extract<Effect, { k: K }>, i }))
+        .filter((x) => x.e.k === k && (!x.e.when || c.toggles[x.e.when])),
+    );
+  const chosen = (o: EffectOwner, i: number) => c.choices[choiceKey(o.id, i)] ?? [];
+  const toggles = owners.flatMap((o) => o.effects.filter((e): e is Extract<Effect, { k: "toggle" }> => e.k === "toggle").map((e) => ({ id: e.id, name: e.name, source: o.name })));
+
   // ---------- inventory & item effects ----------
   const items = c.inventory.map((item) => ({
     item,
@@ -224,6 +273,12 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   c.extraProfs.forEach((p) => profs.add(p));
   // Life Domain "Bonus Proficiency": "you gain proficiency with heavy armor"
   if (has("bonus-proficiency") && subclassOf("cleric") === "life") profs.add("heavy-armor");
+  for (const { e } of effs("prof")) e.ids.forEach((p) => profs.add(p));
+  for (const { o, i } of effs("skillChoice")) chosen(o, i).forEach((s) => profs.add(`skill-${s}`));
+  for (const { o, i } of effs("toolChoice")) chosen(o, i).forEach((p) => profs.add(p));
+  const expertise = new Set(c.expertise);
+  for (const { o, i } of effs("expertiseChoice")) chosen(o, i).forEach((s) => expertise.add(s));
+  const effectLanguages = effs("languageChoice").flatMap(({ o, i }) => chosen(o, i));
 
   // ---------- ability scores ----------
   const scores = {} as Record<Ability, Calc>;
@@ -238,7 +293,7 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   }
   for (const a of ABILITIES) {
     const parts: Part[] = [{ label: "Базовое значение", value: c.base[a] }];
-    if (race?.bonuses[a]) parts.push({ label: race.name, value: race.bonuses[a]! });
+    if (race?.bonuses[a] && !subrace?.replaceBonuses) parts.push({ label: race.name, value: race.bonuses[a]! });
     if (subrace?.bonuses[a]) parts.push({ label: subrace.name, value: subrace.bonuses[a]! });
     if (race?.bonusChoice && c.raceBonusChoice.includes(a)) parts.push({ label: `${race.name}: на выбор`, value: race.bonusChoice.bonus });
     let value = parts.reduce((s, p) => s + p.value, 0);
@@ -249,6 +304,16 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
       parts.push({ ...p, value: used });
       value += used;
     }
+    // feats / traits: "+1 to an ability score, to a maximum of 20"
+    const effAdds: Part[] = [
+      ...effs("ability").filter(({ e }) => e.ability === a).map(({ o, e }) => ({ label: o.name, value: e.value, max: e.max ?? 20 })),
+      ...effs("abilityChoice").filter(({ o, i }) => chosen(o, i).includes(a)).map(({ o, e }) => ({ label: o.name, value: e.value, max: e.max ?? 20 })),
+    ].map(({ label, value: v, max }) => {
+      const used = Math.max(0, Math.min(v, max - value));
+      value += used;
+      return { label, value: used };
+    });
+    parts.push(...effAdds);
     // capstones that raise the maximum
     if (a === "str" || a === "con") {
       if (has("primal-champion")) {
@@ -277,16 +342,38 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   const prof = calc([{ label: `Уровень персонажа ${level}`, value: profByLevel(level) }, ...sumMods("prof")]);
   const pb = prof.value;
 
+  // expression variables for an effect owner
+  const varsFor = (o?: EffectOwner): Record<string, number> => {
+    const v: Record<string, number> = { prof: pb, level, clevel: o?.classId ? classLevel(o.classId) : level };
+    for (const a of ABILITIES) {
+      v[`mod.${a}`] = mods[a];
+      v[`score.${a}`] = scores[a].value;
+    }
+    return v;
+  };
+  const ev = (o: EffectOwner, x: Expr) => {
+    try {
+      return evalExpr(x, varsFor(o));
+    } catch {
+      warnings.push({ level: "warn", text: `Не удалось посчитать «${o.name}»: ${String(x)}` });
+      return 0;
+    }
+  };
+  const effParts = (list: { o: EffectOwner; e: { value: Expr } }[]): Part[] => list.map(({ o, e }) => ({ label: o.name, value: ev(o, e.value) }));
+
   // ---------- saves ----------
   const saveProfs = new Set<Ability>(first ? cat.classes[first.classId]?.saves ?? [] : []);
   if (has("diamond-soul")) ABILITIES.forEach((a) => saveProfs.add(a));
   if (has("slippery-mind")) saveProfs.add("wis");
+  for (const { e } of effs("saveProf")) e.abilities.forEach((a) => saveProfs.add(a));
+  for (const { o, e, i } of effs("abilityChoice")) if (e.saveProf) chosen(o, i).forEach((a) => saveProfs.add(a as Ability));
   const auraOfProtection = has("aura-of-protection") ? Math.max(1, mods.cha) : 0;
   const saves = {} as Sheet["saves"];
   for (const a of ABILITIES) {
     const parts: Part[] = [{ label: `Модификатор ${SHORT[a]}`, value: mods[a] }];
     if (saveProfs.has(a)) parts.push({ label: "Бонус мастерства", value: pb });
     parts.push(...sumMods("save"));
+    parts.push(...effParts(effs("save").filter(({ e }) => !e.abilities || e.abilities.includes(a))));
     if (auraOfProtection) parts.push({ label: "Аура защиты (сам паладин)", value: auraOfProtection });
     saves[a] = { calc: calc(parts), prof: saveProfs.has(a) };
   }
@@ -303,13 +390,16 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   const checkBonus = {} as Record<Ability, Calc>;
   for (const a of ABILITIES) {
     const half = halfFor(a);
-    checkBonus[a] = calc([{ label: `Модификатор ${SHORT[a]}`, value: mods[a] }, ...(half ? [half] : []), ...sumMods("check")]);
+    checkBonus[a] = calc([
+      { label: `Модификатор ${SHORT[a]}`, value: mods[a] }, ...(half ? [half] : []), ...sumMods("check"),
+      ...effParts(effs("check").filter(({ e }) => !e.skills && (!e.abilities || e.abilities.includes(a)))),
+    ]);
   }
   const skills = {} as Sheet["skills"];
   for (const s of cat.ref.skills) {
     const a = s.ability;
     const isProf = profs.has(`skill-${s.id}`);
-    const isExpert = isProf && c.expertise.includes(s.id);
+    const isExpert = isProf && expertise.has(s.id);
     const parts: Part[] = [{ label: `Модификатор ${SHORT[a]}`, value: mods[a] }];
     let level: ProfLevel = "none";
     if (isExpert) {
@@ -326,6 +416,7 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
       }
     }
     parts.push(...sumMods("check"));
+    parts.push(...effParts(effs("check").filter(({ e }) => (e.skills ? e.skills.includes(s.id) : !e.abilities || e.abilities.includes(a)))));
     skills[s.id] = { calc: calc(parts), prof: level, ability: a };
   }
   const passive = (id: string, name: string) => calc([{ label: "Базовое значение", value: 10 }, { label: name, value: skills[id].calc.value }]);
@@ -369,6 +460,8 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
       options.push({ label: "Драконья устойчивость", shieldOk: true, parts: [{ label: "Драконья устойчивость", value: 13 }, { label: "Модификатор ЛОВ", value: mods.dex }] });
     for (const g of globalMods)
       if (g.mod.k === "acBase") options.push({ label: g.label, shieldOk: true, parts: [{ label: g.label, value: g.mod.base }, { label: "Модификатор ЛОВ", value: mods.dex }] });
+    for (const { o, e } of effs("acBase"))
+      options.push({ label: e.label, shieldOk: e.shield, parts: [{ label: e.label, value: ev(o, e.base) }, ...e.abilities.map((a) => ({ label: `Модификатор ${SHORT[a]}`, value: mods[a] }))] });
     const usable = options.filter((o) => o.shieldOk || !wornShield);
     const best = usable.reduce((a, b) => (calc(b.parts).value > calc(a.parts).value ? b : a));
     acParts = best.parts;
@@ -385,14 +478,30 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
     if (g.mod.when === "noArmorNoShield" && (wornArmor || wornShield)) continue;
     acParts.push({ label: g.label, value: g.mod.v });
   }
+  for (const { o, e } of effs("ac")) {
+    if ((e.armor === "none" && wornArmor) || (e.armor === "armored" && !wornArmor)) continue;
+    acParts.push({ label: o.name, value: ev(o, e.value) });
+  }
   const ac = calc(acParts);
 
   // ---------- initiative ----------
-  const initiative = checkBonus.dex;
+  const initiative = calc([...checkBonus.dex.parts, ...effParts(effs("initiative"))]);
 
   // ---------- speed ----------
-  const speedParts: Part[] = [{ label: race ? `${race.name}` : "Раса", value: race?.speed ?? 30 }];
   const heavy = wornArmor?.base?.armor?.cat === "heavy";
+  const armorOk = (cond?: "any" | "none" | "notHeavy") => cond === "none" ? !wornArmor : cond === "notHeavy" ? !heavy : true;
+  const walkSet = effs("speed").filter(({ e }) => e.set && (e.mode ?? "walk") === "walk" && armorOk(e.armor));
+  const speedParts: Part[] = walkSet.length
+    ? [{ label: walkSet[0].o.name, value: ev(walkSet[0].o, walkSet[0].e.value) }]
+    : [{ label: subrace?.speed ? subrace.name : race ? `${race.name}` : "Раса", value: subrace?.speed ?? race?.speed ?? 30 }];
+  for (const { o, e } of effs("speed")) if (!e.set && (e.mode ?? "walk") === "walk" && armorOk(e.armor)) speedParts.push({ label: o.name, value: ev(o, e.value) });
+  const otherSpeeds: Record<string, number> = {};
+  for (const { o, e } of effs("speed")) {
+    const m = e.mode ?? "walk";
+    if (m === "walk" || !armorOk(e.armor)) continue;
+    // "equal to your walking speed" is written as value "walk" -> not supported; numbers only
+    otherSpeeds[m] = e.set ? ev(o, e.value) : (otherSpeeds[m] ?? 0) + ev(o, e.value);
+  }
   if (has("fast-movement") && !heavy) speedParts.push({ label: "Быстрое передвижение", value: 10 });
   if (classLevel("monk") >= 2 && !wornArmor && !wornShield) {
     const lv = cat.classes.monk.levels[classLevel("monk") - 1];
@@ -423,6 +532,12 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   hpParts.push({ label: `ТЕЛ ${mods.con >= 0 ? "+" : ""}${mods.con} × ${level}`, value: mods.con * level });
   if (hasTrait("dwarven-toughness")) hpParts.push({ label: "Дварфийская выдержка", value: level });
   if (has("draconic-resilience")) hpParts.push({ label: "Драконья устойчивость", value: classLevel("sorcerer") });
+  for (const { o, e } of effs("hp")) {
+    // per level: class level for class features, character level for race / feats
+    const per = e.perLevel != null ? ev(o, e.perLevel) * (o.classId ? classLevel(o.classId) : level) : 0;
+    const v = per + (e.flat != null ? ev(o, e.flat) : 0);
+    if (v) hpParts.push({ label: o.name, value: v });
+  }
   let hpMax = calc(hpParts);
   if (c.hp.maxOverride != null) hpMax = calc([{ label: "Задано вручную", value: c.hp.maxOverride }]);
   if (c.exhaustion >= 4) hpMax = calc([...hpMax.parts, { label: "Истощение 4: максимум хитов вдвое меньше", value: -Math.ceil(hpMax.value / 2) }]);
@@ -437,14 +552,24 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   // ---------- spellcasting ----------
   const spellAttackItems = sumMods("spellAttack");
   const spellDcItems = sumMods("spellDc");
+  const castDc = (a: Ability, classId: string) =>
+    calc([
+      { label: "Базовое значение", value: 8 }, { label: "Бонус мастерства", value: pb }, { label: `Модификатор ${SHORT[a]}`, value: mods[a] }, ...spellDcItems,
+      ...effParts(effs("spellDc").filter(({ e }) => !e.classId || e.classId === classId)),
+    ]);
+  const castAttack = (a: Ability, classId: string) =>
+    calc([
+      { label: "Бонус мастерства", value: pb }, { label: `Модификатор ${SHORT[a]}`, value: mods[a] }, ...spellAttackItems,
+      ...effParts(effs("spellAttack").filter(({ e }) => !e.classId || e.classId === classId)),
+    ]);
   const casting: SpellcastingInfo[] = [];
   for (const e of c.classes) {
     const cls = cat.classes[e.classId];
     if (!cls?.casting || e.level < cls.casting.level) continue;
     const a = cls.casting.ability;
     const lv = cls.levels[e.level - 1];
-    const dc = calc([{ label: "Базовое значение", value: 8 }, { label: "Бонус мастерства", value: pb }, { label: `Модификатор ${SHORT[a]}`, value: mods[a] }, ...spellDcItems]);
-    const attack = calc([{ label: "Бонус мастерства", value: pb }, { label: `Модификатор ${SHORT[a]}`, value: mods[a] }, ...spellAttackItems]);
+    const dc = castDc(a, cls.id);
+    const attack = castAttack(a, cls.id);
     let prepared: Calc | null = null;
     if (PREPARED_CASTERS.has(cls.id)) {
       const lvlPart = cls.id === "paladin" ? Math.floor(e.level / 2) : e.level;
@@ -469,26 +594,76 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
       cantrips: lv?.spell?.cantrips ?? 0,
       maxLevel,
       pact: cls.id === "warlock",
+      list: cls.id,
+    });
+  }
+  // subclass casters (Eldritch Knight, Arcane Trickster): tables by class level from the book
+  const subCasters: { classId: string; level: number; slots: number[] }[] = [];
+  for (const e of c.classes) {
+    const sub = e.subclassId ? cat.subclasses[e.subclassId] : null;
+    const sc = sub?.casting;
+    if (!sc) continue;
+    const at = <T,>(tbl: Record<string, T>): T | undefined => {
+      const k = Object.keys(tbl).map(Number).filter((x) => x <= e.level).sort((x, y) => y - x)[0];
+      return k != null ? tbl[String(k)] : undefined;
+    };
+    const slotRow = at(sc.slots);
+    if (!slotRow) continue;
+    const slots9 = Array.from({ length: 9 }, (_, i) => slotRow[i] ?? 0);
+    subCasters.push({ classId: e.classId, level: e.level, slots: slots9 });
+    casting.push({
+      classId: e.classId,
+      className: `${cat.classes[e.classId]?.name}: ${sub!.name}`,
+      ability: sc.ability,
+      dc: castDc(sc.ability, e.classId),
+      attack: castAttack(sc.ability, e.classId),
+      prepared: null,
+      known: at(sc.known) ?? null,
+      cantrips: at(sc.cantrips) ?? 0,
+      maxLevel: slots9.reduce((m, n, i) => (n > 0 ? i + 1 : m), 0),
+      pact: false,
+      list: sc.list,
     });
   }
 
-  // racial spellcasting (SRD traits)
+  // racial spellcasting (SRD traits) and spells granted by book traits / feats
   const racialSpells: RacialSpell[] = [];
-  const raceCaster = (ability: Ability, name: string) => {
-    if (casting.some((k) => k.classId === "race")) return;
+  const raceCaster = (ability: Ability, name: string, classId = "race") => {
+    if (casting.some((k) => k.classId === classId)) return;
     casting.push({
-      classId: "race",
+      classId,
       className: name,
       ability,
-      dc: calc([{ label: "Базовое значение", value: 8 }, { label: "Бонус мастерства", value: pb }, { label: `Модификатор ${SHORT[ability]}`, value: mods[ability] }, ...spellDcItems]),
-      attack: calc([{ label: "Бонус мастерства", value: pb }, { label: `Модификатор ${SHORT[ability]}`, value: mods[ability] }, ...spellAttackItems]),
+      dc: castDc(ability, classId),
+      attack: castAttack(ability, classId),
       prepared: null,
       known: null,
       cantrips: 0,
       maxLevel: 0,
       pact: false,
+      list: null,
     });
   };
+  for (const { o, e } of effs("spells")) {
+    // a class feature's bonus spells use that class's ability unless the book names one
+    const ability = e.ability ?? (o.classId ? cat.classes[o.classId]?.casting?.ability : undefined) ?? "int";
+    const casterId = `owner:${o.id}`;
+    raceCaster(ability, o.name, casterId);
+    for (const s of e.spells) {
+      if ((s.level ?? 1) > level) continue;
+      const sp = cat.spells[s.spell];
+      const uses = e.uses ?? "longRest";
+      const limited = Boolean(sp && sp.level > 0 && uses === "longRest");
+      const how = uses === "ritual" ? "только как ритуал" : uses === "slots" ? "тратит ячейку" : limited ? "раз в продолжительный отдых без ячейки" : "";
+      racialSpells.push({
+        spellId: s.spell,
+        classId: casterId,
+        note: [o.name, e.note, sp?.level ? how : ""].filter(Boolean).join(": "),
+        fixedSlot: limited ? sp.level : undefined,
+        resourceId: limited ? `${o.id}:${s.spell}` : undefined,
+      });
+    }
+  }
   if (hasTrait("high-elf-cantrip")) {
     // "You know one cantrip of your choice from the wizard spell list. Intelligence is your spellcasting ability for it."
     raceCaster("int", "Заговор высшего эльфа");
@@ -508,14 +683,16 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
     return cls?.casting && e.classId !== "warlock" && e.level >= cls.casting.level;
   });
   let slots = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-  if (slotClasses.length === 1) {
+  if (slotClasses.length === 1 && subCasters.length === 0) {
     const e = slotClasses[0];
     slots = [...(cat.classes[e.classId].levels[e.level - 1]?.spell?.slots ?? slots)];
-  } else if (slotClasses.length > 1) {
-    const casterLevel = slotClasses.reduce(
-      (s, e) => s + (FULL_CASTERS.has(e.classId) ? e.level : HALF_CASTERS.has(e.classId) ? Math.floor(e.level / 2) : 0),
-      0,
-    );
+  } else if (slotClasses.length === 0 && subCasters.length === 1) {
+    slots = [...subCasters[0].slots];
+  } else if (slotClasses.length + subCasters.length > 1) {
+    // PHB multiclassing: full levels + half of paladin/ranger + a third of Eldritch Knight / Arcane Trickster (rounded down)
+    const casterLevel =
+      slotClasses.reduce((s, e) => s + (FULL_CASTERS.has(e.classId) ? e.level : HALF_CASTERS.has(e.classId) ? Math.floor(e.level / 2) : 0), 0) +
+      subCasters.reduce((s, x) => s + Math.floor(x.level / 3), 0);
     // the multiclass spellcaster table equals the full-caster (wizard) slot progression
     if (casterLevel > 0) slots = [...(cat.classes.wizard.levels[Math.min(20, casterLevel) - 1]?.spell?.slots ?? slots)];
   }
@@ -558,7 +735,15 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   if (classLevel("sorcerer") >= 2) res({ id: "sorcery-points", name: "Единицы чародейства", max: cs("sorcerer").sorcery_points ?? 0, reset: "long" });
   if (classLevel("wizard")) res({ id: "arcane-recovery", name: "Магическое восстановление", max: 1, reset: "long", note: `Ячейки суммарно до ${Math.ceil(classLevel("wizard") / 2)} уровня, не выше 5` });
   if (hasTrait("breath-weapon")) res({ id: "breath-weapon", name: "Оружие дыхания", max: 1, reset: "short" });
-  for (const rs of racialSpells) if (rs.resourceId) res({ id: rs.resourceId, name: cat.spells[rs.spellId]?.name ?? rs.spellId, max: 1, reset: "long", note: "Дьявольское наследие" });
+  for (const rs of racialSpells) if (rs.resourceId) res({ id: rs.resourceId, name: cat.spells[rs.spellId]?.name ?? rs.spellId, max: 1, reset: "long", note: rs.note });
+  // book features: limited uses, dice pools
+  for (const { o, e } of effs("resource")) {
+    if (resources.some((r) => r.id === e.id)) continue;
+    const clevel = o.classId ? classLevel(o.classId) : level;
+    const die = dieAt(e.die, clevel);
+    res({ id: e.id, name: e.name, max: Math.max(0, Math.floor(ev(o, e.max))), reset: e.reset, die: die ? die.replace("d", "к") : undefined, note: e.note });
+  }
+  const dcs = effs("dc").map(({ o, e }) => ({ name: e.name, source: o.name, calc: calc([{ label: e.name, value: ev(o, e.value) }]) }));
 
   // Dragonborn breath weapon: "DC = 8 + your Constitution modifier + your proficiency bonus.
   // 2d6 damage ... increases to 3d6 at 6th level, 4d6 at 11th level, and 5d6 at 16th level."
@@ -578,9 +763,9 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   if (hasTrait("relentless-endurance")) res({ id: "relentless-endurance", name: "Непоколебимая стойкость", max: 1, reset: "long" });
 
   // ---------- attacks ----------
-  let critFrom = 20;
-  if (has("improved-critical")) critFrom = 19;
-  if (has("superior-critical")) critFrom = 18;
+  let critFrom = Math.min(20, ...effs("critFrom").map(({ e }) => e.value));
+  if (has("improved-critical")) critFrom = Math.min(critFrom, 19);
+  if (has("superior-critical")) critFrom = Math.min(critFrom, 18);
   const raging = Boolean(c.toggles.rage) && classLevel("barbarian") > 0;
   const rageDamage = raging ? cs("barbarian").rage_damage_bonus ?? 0 : 0;
   const archery = has("fighter-fighting-style-archery") || has("ranger-fighting-style-archery");
@@ -606,6 +791,9 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
     const monkOk = monkLevel > 0 && isMonkWeapon(w);
     let ability: Ability = wd.range === "ranged" ? "dex" : "str";
     if ((finesse || monkOk) && mods.dex > mods[ability]) ability = "dex";
+    // e.g. Hex Warrior: "you can use your Charisma modifier instead of Strength or Dexterity"
+    for (const { e } of effs("attackAbility")) if (mods[e.ability] > mods[ability]) ability = e.ability;
+    const rangeOk = (r?: "melee" | "ranged") => !r || r === wd.range;
     const proficient =
       profs.has(`${wd.cat}-weapons`) || profs.has(`${w.id}s`) || profs.has(w.id) || (x.magic?.id === "sun-blade" && (profs.has("longswords") || profs.has("shortswords")));
     const toHit = calc([
@@ -613,6 +801,7 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
       ...(proficient ? [{ label: "Бонус мастерства", value: pb }] : []),
       ...(magicBonus ? [{ label: "Магическое оружие", value: magicBonus }] : []),
       ...(archery && wd.range === "ranged" ? [{ label: "Боевой стиль: Стрельба", value: 2 }] : []),
+      ...effParts(effs("weaponAttack").filter(({ e }) => rangeOk(e.range))),
     ]);
     let die = (x.item.twoHanded && wd.twoHanded) || wd.dice || "1";
     if (monkOk && martialDie) {
@@ -637,6 +826,14 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
       dmg = add(dmg, flat(2));
       dmgParts.push("+2 (Дуэлянт)");
     }
+    for (const { o, e } of effs("weaponDamage")) {
+      if (!rangeOk(e.range)) continue;
+      const v = ev(o, e.value);
+      if (!v) continue;
+      dmg = add(dmg, flat(v));
+      dmgParts.push(`${v > 0 ? "+" : "−"}${Math.abs(v)} (${o.name})`);
+    }
+    for (const { o, e } of effs("weaponExtra")) if (rangeOk(e.range)) extra.push({ dice: e.dice.replace("d", "к"), type: e.type, when: `${o.name}: ${e.note}` });
     if (rageDamage && ability === "str" && wd.range === "melee") {
       dmg = add(dmg, flat(rageDamage));
       dmgParts.push(`+${rageDamage} (ярость)`);
@@ -699,10 +896,11 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
   }
 
   // ---------- warnings about unfinished choices ----------
-  for (const { feature } of features) {
+  for (const { feature, classId } of features) {
     if (feature.choice?.kind === "feature" && feature.choice.options?.length) {
       const picked = (c.choices[feature.id] ?? []).length;
-      if (picked < feature.choice.n) warnings.push({ level: "info", text: `Нужно выбрать: ${feature.name} (${feature.choice.n - picked}).` });
+      const n = countAt(feature.choice.n, classLevel(classId));
+      if (picked < n) warnings.push({ level: "info", text: `Нужно выбрать: ${feature.name} (${n - picked}).` });
     }
     if (feature.invocations) {
       const n = cs("warlock").invocations_known ?? 0;
@@ -785,6 +983,23 @@ export function derive(c: Character, cat: Catalog = defaultCatalog): Sheet {
     weight: { total: totalWeight, capacity },
     critFrom,
     brutalDice: classLevel("barbarian") ? cs("barbarian").brutal_critical_dice ?? 0 : 0,
+    dcs,
+    toggles,
+    otherSpeeds,
+    resists: [...new Set(effs("resist").flatMap(({ e }) => e.types))],
+    // same sense from several sources (darkvision 60 / superior 120): keep the longest
+    senses: Object.values(
+      effs("sense").reduce<Record<string, { name: string; range: number }>>((acc, { e }) => {
+        const key = e.name.toLowerCase().replace(/превосходное\s+/, "");
+        if (!acc[key] || acc[key].range < e.range) acc[key] = { name: e.name, range: e.range };
+        return acc;
+      }, {}),
+    ),
+    feats,
+    owners,
+    expertise: [...expertise],
+    effectLanguages,
+    spellEffects: [...effs("cantripDamage"), ...effs("spellDamage"), ...effs("healBonus")].map(({ o, e }) => ({ e, owner: o.name, vars: varsFor(o) })),
     sneakAttack,
     rageDamage,
     warnings,

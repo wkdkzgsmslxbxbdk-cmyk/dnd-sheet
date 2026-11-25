@@ -1,18 +1,30 @@
 import { useState } from "react";
 import type { Character } from "../../rules/character";
 import type { Sheet } from "../../rules/derive";
-import type { Feature } from "../../rules/types";
+import { ABILITIES, type Feature } from "../../rules/types";
 import { catalog, skillById } from "../../data/catalog";
+import { CHOICE_KINDS, choiceKey, countAt, type Effect, type EffectOwner } from "../../rules/effects";
 import { useStore } from "../../state/store";
 import { Sheet as Modal, RulesText, srcLabel, UntranslatedBadge } from "../common";
 
 /** Features whose title is only a pointer ("Path feature", "Ability Score Improvement") are folded */
 const isStub = (f: Feature) => /improvement-\d$|ability-score-improvement/.test(f.id) || /feature$/i.test(f.en);
+const ABILITY_RU: Record<string, string> = { str: "СИЛ", dex: "ЛОВ", con: "ТЕЛ", int: "ИНТ", wis: "МДР", cha: "ХАР" };
+const BOOK_RU: Record<string, string> = { srd: "SRD", phb: "КИ", xge: "Занатар", tce: "Таша", scag: "ППМ", eepc: "СЗ", vgm: "Воло", mtf: "Морденкайнен", dmg: "РМ" };
+export const bookLabel = (s?: string) => (s ? BOOK_RU[s] ?? s : "");
+
+const clevelOf = (c: Character, classId: string) => c.classes.find((e) => e.classId === classId)?.level ?? 0;
+
+/** How many option picks are still missing on an owner (feature / trait / feat / background) */
+export function pendingChoices(owner: { id: string; effects?: Effect[] }, c: Character): number {
+  return (owner.effects ?? []).reduce((s, e, i) => (CHOICE_KINDS.has(e.k) ? s + Math.max(0, (e as { n: number }).n - (c.choices[choiceKey(owner.id, i)] ?? []).length) : s), 0);
+}
 
 export function FeaturesTab({ c, sheet }: { c: Character; sheet: Sheet }) {
   const update = useStore((s) => s.update);
-  const [open, setOpen] = useState<Feature | null>(null);
+  const [open, setOpen] = useState<{ f: Feature; classId: string } | null>(null);
   const [traitOpen, setTraitOpen] = useState<string | null>(null);
+  const [featOpen, setFeatOpen] = useState<string | null>(null);
   const setChoice = (id: string, values: string[]) => update(c.id, (x) => (x.choices[id] = values));
 
   const optionIds = new Set(sheet.features.flatMap((f) => c.choices[f.feature.id] ?? []));
@@ -25,21 +37,35 @@ export function FeaturesTab({ c, sheet }: { c: Character; sheet: Sheet }) {
 
   return (
     <>
+      {sheet.toggles.length > 0 && (
+        <div className="card">
+          <h2>Состояния умений</h2>
+          {sheet.toggles.map((t) => (
+            <label key={t.id} className="li row" style={{ margin: 0 }}>
+              <input type="checkbox" checked={!!c.toggles[t.id]} onChange={(e) => update(c.id, (x) => (x.toggles[t.id] = e.target.checked))} />
+              <span className="grow">{t.name} <span className="faint">{t.source}</span></span>
+            </label>
+          ))}
+          <div className="faint">Включите, когда умение активно, и его бонусы учтутся в листе.</div>
+        </div>
+      )}
+
       {[...byClass.entries()].map(([classId, list]) => (
         <div className="card" key={classId}>
           <h2>{catalog.classes[classId]?.name}</h2>
           <div className="list">
             {list.sort((a, b) => a.feature.level - b.feature.level).map(({ feature: f }) => {
               const picked = c.choices[f.id] ?? [];
-              const need = needCount(f, c, sheet);
+              const need = needCount(f, c) - picked.length + pendingChoices(f, c);
               return (
-                <div className="li tap" key={f.id} onClick={() => setOpen(f)}>
+                <div className="li tap" key={f.id} onClick={() => setOpen({ f, classId })}>
                   <span className="pill" style={{ minWidth: 34, justifyContent: "center" }}>{f.level}</span>
                   <span className="grow">
                     {f.name} {!f.tr && <UntranslatedBadge tr={false} />}
                     {picked.length > 0 && <div className="faint">{picked.map((p) => optionName(p)).join(", ")}</div>}
                   </span>
-                  {need > picked.length && <span className="pill warn">выбрать</span>}
+                  {f.effects?.length ? <span className="pill good" title="Учтено в расчётах">⚙</span> : null}
+                  {need > 0 && <span className="pill warn">выбрать</span>}
                 </div>
               );
             })}
@@ -53,34 +79,67 @@ export function FeaturesTab({ c, sheet }: { c: Character; sheet: Sheet }) {
           {sheet.traits.filter((t) => !t.parent).map((t) => {
             const needs = Boolean(t.options || t.spellOptions);
             const picked = c.choices[t.id] ?? [];
+            const pending = (needs && !picked.length ? 1 : 0) + pendingChoices(t, c);
             return (
               <div className="li tap" key={t.id} onClick={() => setTraitOpen(t.id)}>
                 <span className="grow">
                   {t.name}
                   {picked.length > 0 && <div className="faint">{picked.map((p) => catalog.traits[p]?.name ?? catalog.spells[p]?.name ?? p).join(", ")}</div>}
                 </span>
-                {needs && !picked.length && <span className="pill warn">выбрать</span>}
+                {t.effects?.length ? <span className="pill good" title="Учтено в расчётах">⚙</span> : null}
+                {pending > 0 && <span className="pill warn">выбрать</span>}
               </div>
             );
           })}
         </div>
+        {(sheet.senses.length > 0 || sheet.resists.length > 0 || Object.keys(sheet.otherSpeeds).length > 0) && (
+          <div className="faint" style={{ marginTop: 6 }}>
+            {sheet.senses.map((s) => `${s.name} ${s.range} фт`).join(", ")}
+            {sheet.resists.length > 0 && ` · сопротивление: ${sheet.resists.map((r) => catalog.ref.damageTypes.find((d) => d.id === r)?.name ?? r).join(", ")}`}
+            {Object.entries(sheet.otherSpeeds).map(([m, v]) => ` · ${({ fly: "полёт", swim: "плавание", climb: "лазание", burrow: "копание" } as Record<string, string>)[m] ?? m} ${v} фт`).join("")}
+          </div>
+        )}
         {sheet.breath && (
           <div className="info-box" style={{ marginTop: 8 }}>
-            Оружие дыхания: {sheet.breath.dice.replace("d", "к")} · спасбросок {sheet.breath.save.toUpperCase()} Сл {sheet.breath.dc.value} · кнопка броска на вкладке «Бой».
+            Оружие дыхания: {sheet.breath.dice.replace("d", "к")} · спасбросок {ABILITY_RU[sheet.breath.save]} Сл {sheet.breath.dc.value} · бросок на вкладке «Бой».
           </div>
         )}
       </div>
 
+      {sheet.feats.length > 0 && (
+        <div className="card">
+          <h2>Черты</h2>
+          <div className="list">
+            {sheet.feats.map((f) => (
+              <div className="li tap" key={f.id} onClick={() => setFeatOpen(f.id)}>
+                <span className="grow">{f.name} <span className="faint">{bookLabel(f.source)}</span></span>
+                {f.effects?.length ? <span className="pill good">⚙</span> : null}
+                {pendingChoices({ id: `feat:${f.id}`, effects: f.effects }, c) > 0 && <span className="pill warn">выбрать</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {bg && (
         <div className="card">
           <h2>Предыстория: {bg.name}</h2>
+          {bg.effects?.length ? <EffectChoices owner={{ id: bg.id, name: bg.name, effects: bg.effects }} c={c} sheet={sheet} /> : null}
           <b>{bg.feature.name}</b>
           <RulesText paras={bg.feature.desc} />
         </div>
       )}
 
-      {open && <FeatureSheet f={open} c={c} sheet={sheet} onClose={() => setOpen(null)} setChoice={setChoice} />}
-      {traitOpen && <TraitSheet id={traitOpen} c={c} onClose={() => setTraitOpen(null)} setChoice={setChoice} />}
+      {open && <FeatureSheet f={open.f} classId={open.classId} c={c} sheet={sheet} onClose={() => setOpen(null)} setChoice={setChoice} />}
+      {traitOpen && <TraitSheet id={traitOpen} c={c} sheet={sheet} onClose={() => setTraitOpen(null)} setChoice={setChoice} />}
+      {featOpen && (
+        <Modal open onClose={() => setFeatOpen(null)} title={catalog.feats[featOpen]?.name}>
+          {catalog.feats[featOpen]?.prereqText && <div className="faint">Требование: {catalog.feats[featOpen].prereqText}</div>}
+          <RulesText paras={catalog.feats[featOpen]?.desc} />
+          <EffectChoices owner={{ id: `feat:${featOpen}`, name: catalog.feats[featOpen]?.name ?? "", effects: catalog.feats[featOpen]?.effects ?? [] }} c={c} sheet={sheet} />
+          <div className="faint">{srcLabel(catalog.feats[featOpen]?.src as string | undefined)}</div>
+        </Modal>
+      )}
     </>
   );
 }
@@ -91,35 +150,96 @@ function optionName(id: string) {
   return skillById[id]?.name ?? (id === "thieves-tools" ? "Воровские инструменты" : id);
 }
 
-function needCount(f: Feature, c: Character, sheet: Sheet): number {
-  if (f.invocations) {
-    const wl = c.classes.find((e) => e.classId === "warlock")?.level ?? 0;
-    return catalog.classes.warlock.levels[wl - 1]?.cs?.invocations_known ?? 0;
-  }
-  if (f.choice?.kind === "feature" && f.choice.options?.length) return f.choice.n;
+function needCount(f: Feature, c: Character): number {
+  if (f.invocations) return catalog.classes.warlock.levels[clevelOf(c, "warlock") - 1]?.cs?.invocations_known ?? 0;
+  if (f.choice?.kind === "feature" && f.choice.options?.length) return countAt(f.choice.n, clevelOf(c, f.class));
   if (f.choice?.kind === "expertise") return 2;
-  void sheet;
   return 0;
 }
 
-function FeatureSheet({ f, c, sheet, onClose, setChoice }: { f: Feature; c: Character; sheet: Sheet; onClose: () => void; setChoice: (id: string, v: string[]) => void }) {
+/** Pickers for every choice an effect owner asks for (skills, tools, languages, abilities, feats) */
+export function EffectChoices({ owner, c, sheet }: { owner: EffectOwner; c: Character; sheet: Sheet }) {
+  const update = useStore((s) => s.update);
+  const blocks = owner.effects
+    .map((e, i) => ({ e, i }))
+    .filter(({ e }) => CHOICE_KINDS.has(e.k));
+  if (!blocks.length) return null;
+  return (
+    <div style={{ margin: "8px 0" }}>
+      {blocks.map(({ e, i }) => {
+        const key = choiceKey(owner.id, i);
+        const picked = c.choices[key] ?? [];
+        const n = (e as { n: number }).n;
+        let options: { id: string; name: string; disabled?: boolean }[] = [];
+        let title = "";
+        if (e.k === "skillChoice") {
+          title = "Навыки";
+          options = catalog.ref.skills.filter((s) => !e.from || e.from.includes(s.id)).map((s) => ({ id: s.id, name: s.name }));
+        } else if (e.k === "expertiseChoice") {
+          title = "Компетентность";
+          options = catalog.ref.skills
+            .filter((s) => (!e.from || e.from.includes(s.id)) && (sheet.skills[s.id].prof !== "none" && sheet.skills[s.id].prof !== "half"))
+            .map((s) => ({ id: s.id, name: s.name }));
+        } else if (e.k === "toolChoice") {
+          title = "Инструменты";
+          const P = catalog.ref.proficiencies;
+          const ids = e.from ?? Object.keys(P).filter((p) => /Tools|Instruments|Gaming|Kits?/i.test(P[p].type));
+          options = ids.map((id) => ({ id, name: P[id]?.name ?? id }));
+        } else if (e.k === "languageChoice") {
+          title = "Языки";
+          options = catalog.ref.languages.map((l) => ({ id: l.id, name: l.name }));
+        } else if (e.k === "abilityChoice") {
+          title = `Характеристики (+${e.value})`;
+          options = (e.from ?? ABILITIES).map((a) => ({ id: a, name: ABILITY_RU[a] }));
+        } else if (e.k === "featChoice") {
+          title = "Черта";
+          options = Object.values(catalog.feats)
+            .sort((a, b) => a.name.localeCompare(b.name, "ru"))
+            .map((f) => ({ id: f.id, name: `${f.name}${f.prereq.length ? ` (${f.prereq.map((p) => `${ABILITY_RU[p.ability]} ${p.min}`).join(", ")})` : ""}`, disabled: f.prereq.some((p) => sheet.scores[p.ability].value < p.min) }));
+        }
+        const toggle = (id: string) =>
+          update(c.id, (x) => {
+            const cur = x.choices[key] ?? [];
+            x.choices[key] = cur.includes(id) ? cur.filter((v) => v !== id) : n === 1 ? [id] : [...cur, id].slice(-n);
+          });
+        return (
+          <div key={i} style={{ marginBottom: 8 }}>
+            <div className="row"><b className="grow">{title}</b><span className={`pill ${picked.length === n ? "good" : "warn"}`}>{picked.length}/{n}</span></div>
+            <div className="chips" style={{ marginTop: 4 }}>
+              {options.map((o) => (
+                <span key={o.id} className={`chip${picked.includes(o.id) ? " on" : ""}`} style={{ opacity: o.disabled && !picked.includes(o.id) ? 0.45 : 1 }} onClick={() => (!o.disabled || picked.includes(o.id)) && toggle(o.id)}>
+                  {o.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function FeatureSheet({ f, classId, c, sheet, onClose, setChoice }: { f: Feature; classId: string; c: Character; sheet: Sheet; onClose: () => void; setChoice: (id: string, v: string[]) => void }) {
   const update = useStore((s) => s.update);
   const picked = c.choices[f.id] ?? [];
-  const need = needCount(f, c, sheet);
+  const need = needCount(f, c);
   const toggle = (id: string) => {
     const next = picked.includes(id) ? picked.filter((x) => x !== id) : need === 1 ? [id] : [...picked, id].slice(-need);
     setChoice(f.id, next);
   };
   let options: { id: string; name: string; desc?: string[]; locked?: string }[] = [];
+  const cl = clevelOf(c, f.class);
   if (f.invocations) {
-    const wl = c.classes.find((e) => e.classId === "warlock")?.level ?? 0;
     options = f.invocations.map((id) => {
       const inv = catalog.features[id];
-      const lockedLevel = inv && inv.level > wl ? `с ${inv.level} уровня колдуна` : undefined;
+      const lockedLevel = inv && inv.level > cl ? `с ${inv.level} уровня колдуна` : undefined;
       return { id, name: inv?.name.replace(/^[^:]+:\s*/, "") ?? id, desc: inv?.desc, locked: lockedLevel };
     });
   } else if (f.choice?.kind === "feature" && f.choice.options) {
-    options = f.choice.options.filter(Boolean).map((id) => ({ id: id!, name: optionName(id!), desc: catalog.features[id!]?.desc }));
+    options = f.choice.options.filter(Boolean).map((id) => {
+      const opt = catalog.features[id!];
+      return { id: id!, name: optionName(id!), desc: opt?.desc, locked: opt && opt.level > cl ? `с ${opt.level} уровня` : undefined };
+    });
   } else if (f.choice?.kind === "expertise") {
     // expertise: two of your proficient skills (or thieves' tools for rogues)
     const prof = catalog.ref.skills.filter((s) => sheet.skills[s.id].prof === "prof" || sheet.skills[s.id].prof === "expert");
@@ -140,8 +260,12 @@ function FeatureSheet({ f, c, sheet, onClose, setChoice }: { f: Feature; c: Char
 
   return (
     <Modal open onClose={onClose} title={<>{f.name} <UntranslatedBadge tr={f.tr} /></>}>
-      <div className="faint" style={{ marginBottom: 6 }}>{catalog.classes[f.class]?.name}, {f.level} уровень{f.subclass ? ` · ${catalog.subclasses[f.subclass]?.name}` : ""}{srcLabel(f.src) ? ` · ${srcLabel(f.src)}` : ""}</div>
+      <div className="faint" style={{ marginBottom: 6 }}>
+        {catalog.classes[f.class]?.name}, {f.level} уровень{f.subclass ? ` · ${catalog.subclasses[f.subclass]?.name}` : ""}
+        {srcLabel(f.src) ? ` · ${srcLabel(f.src)}` : ""}
+      </div>
       <RulesText paras={f.desc} />
+      <EffectChoices owner={{ id: f.id, name: f.name, classId, effects: f.effects ?? [] }} c={c} sheet={sheet} />
       {options.length > 0 && (
         <>
           <h3 style={{ margin: "10px 0 6px" }}>Выбор: {picked.length}/{need}</h3>
@@ -175,13 +299,14 @@ function FeatureSheet({ f, c, sheet, onClose, setChoice }: { f: Feature; c: Char
   );
 }
 
-function TraitSheet({ id, c, onClose, setChoice }: { id: string; c: Character; onClose: () => void; setChoice: (id: string, v: string[]) => void }) {
+function TraitSheet({ id, c, sheet, onClose, setChoice }: { id: string; c: Character; sheet: Sheet; onClose: () => void; setChoice: (id: string, v: string[]) => void }) {
   const t = catalog.traits[id];
   const picked = c.choices[id] ?? [];
-  const options = t.options?.map((o) => ({ id: o, name: catalog.traits[o]?.name ?? o, desc: catalog.traits[o]?.desc })) ?? t.spellOptions?.map((o) => ({ id: o, name: catalog.spells[o]?.name ?? o, desc: catalog.spells[o]?.desc.slice(0, 1) })) ?? [];
+  const options = t.options?.map((o) => ({ id: o, name: catalog.traits[o]?.name ?? o })) ?? t.spellOptions?.map((o) => ({ id: o, name: catalog.spells[o]?.name ?? o })) ?? [];
   return (
     <Modal open onClose={onClose} title={t.name}>
       <RulesText paras={t.desc} />
+      <EffectChoices owner={{ id: t.id, name: t.name, effects: t.effects ?? [] }} c={c} sheet={sheet} />
       {options.length > 0 && (
         <>
           <h3 style={{ margin: "10px 0 6px" }}>Выберите один вариант</h3>
@@ -195,6 +320,7 @@ function TraitSheet({ id, c, onClose, setChoice }: { id: string; c: Character; o
           </div>
         </>
       )}
+      <div className="faint">{srcLabel(t.src as string | undefined)}</div>
     </Modal>
   );
 }

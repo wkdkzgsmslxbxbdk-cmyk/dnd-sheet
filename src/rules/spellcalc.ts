@@ -12,6 +12,7 @@ import type { Sheet, Calc } from "./derive";
 import { abilityShort, calc } from "./derive";
 import type { Ability, Spell } from "./types";
 import { add, average, dice, flat, formatDice, maximum, parseDice, scale, type DiceExpr } from "./dice";
+import { evalExpr, type Expr } from "./effects";
 
 export type EffectKind = "damage" | "heal" | "temp" | "hpmax" | "pool" | "rider";
 
@@ -237,6 +238,33 @@ export function computeSpell(
     healing.expr = flat(max);
   }
   if (healing && has("blessed-healer") && spell.level >= 1) notes.push(`Благословенный целитель: если лечите другого, сами восстанавливаете ${2 + slot} хитов.`);
+
+  // ---- book features (data/books): Potent Spellcasting, Empowered Healing-style bonuses ----
+  for (const { e, owner, vars } of sheet.spellEffects) {
+    const v = evalExpr((e as { value: Expr }).value, { ...vars, slot });
+    if (!v) continue;
+    const sign = `${v > 0 ? "+" : "−"}${Math.abs(v)} (${owner})`;
+    if (e.k === "cantripDamage") {
+      const target = spell.level === 0 && (!e.classId || e.classId === classId) ? effects.find((x) => x.kind === "damage") : undefined;
+      if (target) {
+        target.expr = add(target.expr, flat(v));
+        target.parts.push(sign);
+      }
+    } else if (e.k === "spellDamage") {
+      const ok = (!e.classId || e.classId === classId) && (!e.school || e.school === spell.school) && (!e.spells || e.spells.includes(spell.id));
+      const target = ok ? effects.find((x) => x.kind === "damage" && (!e.damageType || x.type === e.damageType)) : undefined;
+      if (target) {
+        target.expr = add(target.expr, flat(v));
+        target.parts.push(sign);
+        if (e.note) notes.push(`${owner}: ${e.note}`);
+      }
+    } else if (e.k === "healBonus") {
+      if (healing && spell.level >= (e.minLevel ?? 1)) {
+        healing.expr = add(healing.expr, flat(v));
+        healing.parts.push(sign);
+      }
+    }
+  }
 
   if (spell.attack === "melee" || spell.attack === "ranged") {
     if (sheet.critFrom < 20) notes.push(`Критическое попадание на ${sheet.critFrom}–20 относится только к атакам оружием.`);

@@ -9,6 +9,7 @@ import { computeSpell, effectTotal, type SpellEffect } from "../../rules/spellca
 import { useStore } from "../../state/store";
 import { Hint, Sheet as Modal, RulesText, plural, srcLabel, useExplain, UntranslatedBadge } from "../common";
 import { rollCheck, rollDamage } from "../roll";
+import { bookLabel } from "./FeaturesTab";
 
 const LEVEL_NAME = (l: number) => (l === 0 ? "Заговоры" : `${l} уровень`);
 const PREPARE_ALL = new Set(["cleric", "druid", "paladin"]); // prepare from the whole class list
@@ -31,13 +32,15 @@ export function MagicTab({ c, sheet }: { c: Character; sheet: Sheet }) {
   const [open, setOpen] = useState<ListedSpell | null>(null);
   const [browse, setBrowse] = useState<SpellcastingInfo | null>(null);
 
-  const classCasters = sheet.casting.filter((k) => k.classId !== "race");
+  const isGranted = (id: string) => id === "race" || id.startsWith("owner:");
+  const classCasters = sheet.casting.filter((k) => !isGranted(k.classId));
   const listed = useMemo(() => {
     const out: ListedSpell[] = [];
     const seen = new Set<string>();
     // always-prepared subclass spells (domain / circle spells)
     for (const e of c.classes) {
       const sub = e.subclassId ? catalog.subclasses[e.subclassId] : null;
+      if (sub?.spellMode === "expanded") continue; // patron lists only widen the class list
       for (const s of sub?.spells ?? []) {
         const sp = catalog.spells[s.spell];
         if (sp && e.level >= s.level && !seen.has(sp.id)) {
@@ -56,7 +59,7 @@ export function MagicTab({ c, sheet }: { c: Character; sheet: Sheet }) {
       const sp = catalog.spells[r.spellId];
       if (!sp || seen.has(sp.id)) continue;
       seen.add(sp.id);
-      out.push({ spell: sp, classId: "race", prepared: true, always: true, note: r.note, fixedSlot: r.fixedSlot, resourceId: r.resourceId });
+      out.push({ spell: sp, classId: r.classId ?? "race", prepared: true, always: true, note: r.note, fixedSlot: r.fixedSlot, resourceId: r.resourceId });
     }
     return out.sort((a, b) => a.spell.level - b.spell.level || a.spell.name.localeCompare(b.spell.name, "ru"));
   }, [c, sheet]);
@@ -98,7 +101,7 @@ export function MagicTab({ c, sheet }: { c: Character; sheet: Sheet }) {
                 <div className="vl">{formatMod(k.attack.value)}</div>
               </div>
             </div>
-            {k.classId !== "race" && (
+            {!isGranted(k.classId) && (
               <div className="row wrap" style={{ marginTop: 8, gap: 6 }}>
                 {k.cantrips > 0 && <span className={`pill ${cantrips > k.cantrips ? "bad" : cantrips === k.cantrips ? "good" : ""}`}>Заговоры {cantrips}/{k.cantrips}</span>}
                 {k.prepared && <span className={`pill ${prepared > k.prepared.value ? "bad" : prepared === k.prepared.value ? "good" : ""}`} onClick={() => setExplain({ title: "Сколько можно подготовить", calc: k.prepared! })}>Подготовлено {prepared}/{k.prepared.value}</span>}
@@ -108,7 +111,7 @@ export function MagicTab({ c, sheet }: { c: Character; sheet: Sheet }) {
                 <button className="small" onClick={() => setBrowse(k)}>+ Заклинания</button>
               </div>
             )}
-            {k.classId === "race" && <div className="faint" style={{ marginTop: 6 }}>Расовая магия</div>}
+            {isGranted(k.classId) && <div className="faint" style={{ marginTop: 6 }}>{k.classId === "race" ? "Расовая магия" : "Заклинания от умения, расы или черты"}</div>}
           </div>
         );
       })}
@@ -344,8 +347,13 @@ function SpellBrowser({ caster, c, onClose }: { caster: SpellcastingInfo; c: Cha
   // highest spell level this class can take; wizards learn up to the slot level they have
   const maxLevel = Math.max(caster.maxLevel, 0);
   const mine = new Set(c.spells.filter((s) => s.classId === classId).map((s) => s.id));
+  // the class list (Eldritch Knight / Arcane Trickster learn from the wizard list) + a patron's expanded list
+  const listClass = caster.list ?? classId;
+  const entry = c.classes.find((e) => e.classId === classId);
+  const sub = entry?.subclassId ? catalog.subclasses[entry.subclassId] : null;
+  const expanded = new Set(sub?.spellMode === "expanded" ? sub.spells.filter((s) => s.level <= (entry?.level ?? 0)).map((s) => s.spell) : []);
   const list = catalog.spellList
-    .filter((s) => s.classes.includes(classId) && s.level <= maxLevel && (s.level > 0 || caster.cantrips > 0))
+    .filter((s) => (s.classes.includes(listClass) || expanded.has(s.id)) && s.level <= maxLevel && (s.level > 0 || caster.cantrips > 0))
     .filter((s) => lvl === "all" || s.level === lvl)
     .filter((s) => !q || s.name.toLowerCase().includes(q.toLowerCase()) || s.en.toLowerCase().includes(q.toLowerCase()))
     .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name, "ru"));
@@ -381,7 +389,7 @@ function SpellBrowser({ caster, c, onClose }: { caster: SpellcastingInfo; c: Cha
           <div className="li tap" key={s.id} onClick={() => toggle(s)}>
             <input type="checkbox" readOnly checked={mine.has(s.id)} />
             <span className="grow">
-              {s.name} <span className="faint">{s.level === 0 ? "заговор" : `${s.level} ур.`} · {schoolById[s.school]?.name}</span>
+              {s.name} <span className="faint">{s.level === 0 ? "заговор" : `${s.level} ур.`} · {schoolById[s.school]?.name}{s.source && s.source !== "srd" ? ` · ${bookLabel(s.source)}` : ""}{expanded.has(s.id) ? " · покровитель" : ""}</span>
               {s.conc && <span className="pill" style={{ marginLeft: 4 }}>К</span>}
             </span>
           </div>

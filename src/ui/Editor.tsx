@@ -6,6 +6,7 @@ import { catalog } from "../data/catalog";
 import { formatMod, rollDie } from "../rules/dice";
 import { useStore } from "../state/store";
 import { Counter, RulesText } from "./common";
+import { bookLabel } from "./tabs/FeaturesTab";
 
 const FULL: Record<Ability, string> = { str: "Сила", dex: "Ловкость", con: "Телосложение", int: "Интеллект", wis: "Мудрость", cha: "Харизма" };
 const SHORT: Record<Ability, string> = { str: "СИЛ", dex: "ЛОВ", con: "ТЕЛ", int: "ИНТ", wis: "МДР", cha: "ХАР" };
@@ -110,21 +111,28 @@ export function Editor({ c, onDone }: { c: Character; onDone: () => void }) {
               value={c.raceId}
               onChange={(e) => upd((x) => {
                 x.raceId = e.target.value;
-                x.subraceId = catalog.races[e.target.value].subraces[0] ?? null;
+                // races whose SRD entry has no subrace (human) start without one
+                x.subraceId = catalog.races[e.target.value].subraces.find((s) => catalog.subraces[s]?.source === "srd") ?? null;
                 x.raceBonusChoice = [];
               })}
             >
-              {catalog.raceList.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+              {[...catalog.raceList].sort((a, b) => a.name.localeCompare(b.name, "ru")).map((r) => (
+                <option key={r.id} value={r.id}>{r.name}{r.source && r.source !== "srd" ? ` (${bookLabel(r.source)})` : ""}</option>
+              ))}
             </select>
             {race?.subraces.length ? (
-              <select value={c.subraceId ?? ""} onChange={(e) => upd((x) => (x.subraceId = e.target.value || null))}>
-                {race.subraces.map((s) => <option key={s} value={s}>{catalog.subraces[s]?.name}</option>)}
+              <select value={c.subraceId ?? ""} onChange={(e) => upd((x) => { x.subraceId = e.target.value || null; })}>
+                {!race.subraces.some((s) => catalog.subraces[s]?.source === "srd") && <option value="">Обычный</option>}
+                {race.subraces.map((s) => (
+                  <option key={s} value={s}>{catalog.subraces[s]?.name}{catalog.subraces[s]?.source !== "srd" ? ` (${bookLabel(catalog.subraces[s]?.source)})` : ""}</option>
+                ))}
               </select>
             ) : <div />}
           </div>
           <div className="faint" style={{ marginTop: 6 }}>
-            {Object.entries({ ...race?.bonuses, ...(c.subraceId ? catalog.subraces[c.subraceId]?.bonuses : {}) }).map(([a, v]) => `${SHORT[a as Ability]} +${v}`).join(", ")}
-            {` · скорость ${race?.speed} фт · ${race?.size}`}
+            {Object.entries({ ...(c.subraceId && catalog.subraces[c.subraceId]?.replaceBonuses ? {} : race?.bonuses), ...(c.subraceId ? catalog.subraces[c.subraceId]?.bonuses : {}) }).map(([a, v]) => `${SHORT[a as Ability]} +${v}`).join(", ")}
+            {` · скорость ${(c.subraceId && catalog.subraces[c.subraceId]?.speed) || race?.speed} фт · ${race?.size}`}
+            {c.subraceId && catalog.subraces[c.subraceId]?.replaceBonuses && " · характеристики на выбор — на вкладке «Умения»"}
           </div>
           {race?.bonusChoice && (
             <div style={{ marginTop: 8 }}>
@@ -140,7 +148,7 @@ export function Editor({ c, onDone }: { c: Character; onDone: () => void }) {
           )}
           <details style={{ marginTop: 8 }}>
             <summary className="faint">О расе</summary>
-            <RulesText paras={[race?.age, race?.alignment, race?.sizeDesc, race?.languageDesc].filter(Boolean) as string[]} />
+            <RulesText paras={[...(race?.desc ?? []), race?.age, race?.alignment, race?.sizeDesc, race?.languageDesc].filter(Boolean) as string[]} />
           </details>
         </div>
 
@@ -160,7 +168,9 @@ export function Editor({ c, onDone }: { c: Character; onDone: () => void }) {
                 {e.level >= subLv ? (
                   <select value={e.subclassId ?? ""} onChange={(ev) => upd((x) => (x.classes[i].subclassId = ev.target.value || null))}>
                     <option value="">— подкласс не выбран —</option>
-                    {cls.subclasses.map((s) => <option key={s} value={s}>{catalog.subclasses[s]?.name}</option>)}
+                    {cls.subclasses.map((s) => (
+                      <option key={s} value={s}>{catalog.subclasses[s]?.name} ({bookLabel(catalog.subclasses[s]?.source)})</option>
+                    ))}
                   </select>
                 ) : (
                   <span className="faint">Подкласс выбирается на {subLv} уровне.</span>
@@ -185,7 +195,7 @@ export function Editor({ c, onDone }: { c: Character; onDone: () => void }) {
               </div>
             </details>
           )}
-          <div className="faint" style={{ marginTop: 6 }}>В SRD у каждого класса один подкласс. Остальные подклассы из книг появятся позже.</div>
+          <div className="faint" style={{ marginTop: 6 }}>В скобках — книга: SRD, КИ (Книга игрока), Занатар, Таша и другие.</div>
         </div>
 
         <div className="card">
@@ -249,22 +259,24 @@ export function Editor({ c, onDone }: { c: Character; onDone: () => void }) {
           <div className="card">
             <h2>Увеличение характеристик</h2>
             <div className="faint" style={{ marginBottom: 6 }}>+2 к одной или +1 к двум характеристикам (не выше 20), либо черта вместо этого.</div>
-            {asiSlots.map((s) => <AsiEditor key={s.key} label={s.label} value={c.asi[s.key]} onChange={(v) => upd((x) => { if (v) x.asi[s.key] = v; else delete x.asi[s.key]; })} />)}
+            {asiSlots.map((s) => <AsiEditor key={s.key} label={s.label} value={c.asi[s.key]} scores={sheet.scores} onChange={(v) => upd((x) => { if (v) x.asi[s.key] = v; else delete x.asi[s.key]; })} />)}
+            <div className="faint">Выборы внутри черты (характеристика, навыки) — на вкладке «Умения».</div>
           </div>
         )}
 
         <div className="card">
           <h2>Предыстория</h2>
           <select value={c.backgroundId ?? ""} onChange={(e) => upd((x) => (x.backgroundId = e.target.value || null))}>
-            {Object.values(catalog.backgrounds).map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+            {Object.values(catalog.backgrounds).sort((a, b) => a.name.localeCompare(b.name, "ru")).map((b) => (
+              <option key={b.id} value={b.id}>{b.name} ({bookLabel(b.source)})</option>
+            ))}
             <option value="">Своя предыстория</option>
           </select>
           <div className="faint" style={{ marginTop: 6 }}>
             {bg
-              ? `Навыки: ${bg.profs.filter((p) => p.startsWith("skill-")).map((p) => catalog.ref.skills.find((s) => `skill-${s.id}` === p)?.name).join(", ")} · ${bg.languageChoice?.n ?? 0} языка на выбор · ${bg.gold} зм`
+              ? `Навыки: ${bg.profs.filter((p) => p.startsWith("skill-")).map((p) => catalog.ref.skills.find((s) => `skill-${s.id}` === p)?.name).join(", ")} · ${bg.gold} зм. Выбор инструментов и языков — на вкладке «Умения».`
               : "По правилу «Настройка предыстории» из Книги игрока: два любых навыка и два языка или инструмента. Отметьте их ниже."}
           </div>
-          <div className="faint" style={{ marginTop: 4 }}>В SRD только одна предыстория (Прислужник). Остальные из Книги игрока будут добавлены позже.</div>
         </div>
 
         <div className="card">
@@ -357,7 +369,7 @@ export function Editor({ c, onDone }: { c: Character; onDone: () => void }) {
   );
 }
 
-function AsiEditor({ label, value, onChange }: { label: string; value: AsiChoice | undefined; onChange: (v: AsiChoice | null) => void }) {
+function AsiEditor({ label, value, scores, onChange }: { label: string; value: AsiChoice | undefined; scores: Record<Ability, { value: number }>; onChange: (v: AsiChoice | null) => void }) {
   const kind = value?.kind ?? "asi";
   const abilities = value?.kind === "asi" ? value.abilities : {};
   const spent = Object.values(abilities).reduce((s, v) => s + (v ?? 0), 0);
@@ -385,9 +397,19 @@ function AsiEditor({ label, value, onChange }: { label: string; value: AsiChoice
           <span className="faint">{spent}/2</span>
         </div>
       ) : (
-        <select value={value?.kind === "feat" ? value.featId : ""} onChange={(e) => onChange({ kind: "feat", featId: e.target.value })}>
-          {Object.values(catalog.feats).map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
-        </select>
+        <>
+          <select value={value?.kind === "feat" ? value.featId : ""} onChange={(e) => onChange({ kind: "feat", featId: e.target.value })}>
+            {Object.values(catalog.feats).sort((a, b) => a.name.localeCompare(b.name, "ru")).map((f) => {
+              const unmet = f.prereq.some((p) => scores[p.ability].value < p.min);
+              return (
+                <option key={f.id} value={f.id} disabled={unmet}>
+                  {f.name}{f.prereq.length ? ` (${f.prereq.map((p) => `${SHORT[p.ability]} ${p.min}`).join(", ")})` : ""}{f.prereqText ? " *" : ""}
+                </option>
+              );
+            })}
+          </select>
+          {value?.kind === "feat" && catalog.feats[value.featId]?.prereqText && <div className="faint">Требование: {catalog.feats[value.featId].prereqText}</div>}
+        </>
       )}
     </div>
   );

@@ -444,6 +444,123 @@ const magicItems = en("Magic-Items").map((m) => {
   };
 });
 
+// ---- Rulebook content (data/books/<book>/*.json), see docs/book-content-guide.md ----
+const BOOKS = join(ROOT, "data", "books");
+const SPELL_CAST = (s) => CAST_RU[s] ?? s;
+for (const list of [spells, features, classes, subclasses, races, subraces, traits, backgrounds, feats]) for (const x of list) x.source ??= "srd";
+let bookCount = 0;
+if (existsSync(BOOKS)) {
+  const seen = new Map();
+  for (const [kind, list] of Object.entries({ spells, features, subclasses, races, subraces, traits, backgrounds, feats })) for (const x of list) seen.set(`${kind}:${x.id}`, "srd");
+  const addUnique = (kind, list, item, file) => {
+    const key = `${kind}:${item.id}`;
+    if (seen.has(key)) throw new Error(`${file}: duplicate ${kind} id "${item.id}" (already in ${seen.get(key)})`);
+    seen.set(key, file);
+    list.push(item);
+    bookCount++;
+  };
+  const pending = []; // feature options appended to their parent's choice after all files load
+  for (const book of readdirSync(BOOKS)) {
+    const dir = join(BOOKS, book);
+    for (const file of readdirSync(dir).filter((f) => f.endsWith(".json")).sort()) {
+      const rel = `${book}/${file}`;
+      const data = JSON.parse(readFileSync(join(dir, file), "utf8"));
+      const src = (page) => (page ? `${book}:${page}` : null);
+      const common = (x) => ({ source: book, tr: true, src: src(x.page), effects: x.effects ?? undefined });
+      const addFeature = (f, cls, sub) => {
+        addUnique("features", features, {
+          id: f.id, name: f.name, en: f.en, class: f.class ?? cls, subclass: f.subclass ?? sub ?? null, level: f.level ?? 1,
+          parent: f.parent ?? null, desc: f.desc ?? [], choice: f.choice ?? null, invocations: null, prereq: f.prereq ?? null, ...common(f),
+        }, rel);
+        for (const target of f.addTo ?? []) pending.push({ target, id: f.id, rel });
+      };
+      for (const s of data.subclasses ?? []) {
+        const byLevel = new Map();
+        for (const f of s.features ?? []) {
+          addFeature(f, s.class, s.id);
+          byLevel.set(f.level, [...(byLevel.get(f.level) ?? []), f.id]);
+        }
+        addUnique("subclasses", subclasses, {
+          id: s.id, name: s.name, en: s.en, class: s.class, flavor: s.flavor ?? "", desc: s.desc ?? [],
+          levels: [...byLevel.entries()].sort((a, b) => a[0] - b[0]).map(([level, fs]) => ({ level, features: fs, cs: null })),
+          spells: s.spells ?? [], spellMode: s.spellMode ?? "always", casting: s.casting ?? null, ...common(s),
+        }, rel);
+        const cls = classes.find((c) => c.id === s.class);
+        if (!cls) throw new Error(`${rel}: unknown class ${s.class}`);
+        cls.subclasses.push(s.id);
+      }
+      for (const f of data.features ?? []) addFeature(f, f.class, f.subclass);
+      for (const s of data.spells ?? []) {
+        addUnique("spells", spells, {
+          id: s.id, name: s.name, en: s.en, level: s.level, school: s.school, cast: SPELL_CAST(s.cast), range: s.range, dur: s.dur,
+          conc: Boolean(s.conc), ritual: Boolean(s.ritual), comp: s.comp, mat: s.mat ?? null, desc: s.desc, higher: s.higher ?? null,
+          classes: s.classes ?? [], subclasses: s.subclasses ?? [], attack: s.attack ?? null, dmg: s.dmg ?? null, heal: s.heal ?? null,
+          save: s.save ?? null, aoe: s.aoe ? { ...s.aoe, name: AOE_RU[s.aoe.type] ?? s.aoe.type } : null, ...common(s),
+        }, rel);
+      }
+      for (const t of data.traits ?? []) {
+        addUnique("traits", traits, {
+          id: t.id, name: t.name, en: t.en, desc: t.desc ?? [], profs: t.profs ?? [], profChoice: null, options: t.options ?? null,
+          spellOptions: t.spellOptions ?? null, damageType: t.damageType ?? null, breath: t.breath ?? null, parent: t.parent ?? null, ...common(t),
+        }, rel);
+      }
+      for (const r of data.races ?? []) {
+        addUnique("races", races, {
+          id: r.id, name: r.name, en: r.en, speed: r.speed ?? 30, size: r.size ?? "Средний", bonuses: r.bonuses ?? {}, bonusChoice: r.bonusChoice ?? null,
+          languages: r.languages ?? ["common"], languageChoice: r.languageChoice ?? null, profs: r.profs ?? [], profChoice: null,
+          traits: r.traits ?? [], subraces: [], age: "", alignment: "", sizeDesc: "", languageDesc: "", desc: r.desc ?? [], ...common(r),
+        }, rel);
+      }
+      for (const s of data.subraces ?? []) {
+        addUnique("subraces", subraces, {
+          id: s.id, name: s.name, en: s.en, race: s.race, desc: (s.desc ?? []).join("\n"), bonuses: s.bonuses ?? {}, traits: s.traits ?? [],
+          profs: s.profs ?? [], languageChoice: s.languageChoice ?? null, speed: s.speed ?? null,
+          replaceBonuses: Boolean(s.replaceBonuses), ...common(s),
+        }, rel);
+      }
+      for (const b of data.backgrounds ?? []) {
+        addUnique("backgrounds", backgrounds, {
+          id: b.id, name: b.name, en: b.en, profs: b.profs ?? [], languageChoice: b.languageChoice ?? null, equipment: b.equipment ?? [],
+          gold: b.gold ?? 0, feature: b.feature, desc: b.desc ?? [], ...common(b),
+        }, rel);
+      }
+      for (const f of data.feats ?? []) {
+        addUnique("feats", feats, { id: f.id, name: f.name, en: f.en, prereq: f.prereq ?? [], prereqText: f.prereqText ?? null, desc: f.desc ?? [], ...common(f) }, rel);
+      }
+      for (const a of data.classSpells ?? []) {
+        // expanded class spell lists (e.g. Tasha's): {class, spells: [...]}
+        for (const id of a.spells) pending.push({ classSpell: a.class, id, rel });
+      }
+    }
+  }
+  // attach subraces to races and feature options to their parent choices
+  for (const s of subraces) {
+    const r = races.find((x) => x.id === s.race);
+    if (!r) throw new Error(`subrace ${s.id}: unknown race ${s.race}`);
+    if (!r.subraces.includes(s.id)) r.subraces.push(s.id);
+  }
+  for (const p of pending) {
+    if (p.classSpell) {
+      const sp = spells.find((x) => x.id === p.id);
+      if (!sp) throw new Error(`${p.rel}: classSpells unknown spell ${p.id}`);
+      if (!sp.classes.includes(p.classSpell)) sp.classes.push(p.classSpell);
+      continue;
+    }
+    const parent = features.find((f) => f.id === p.target);
+    if (!parent) throw new Error(`${p.rel}: addTo unknown feature ${p.target}`);
+    if (parent.invocations) parent.invocations.push(p.id);
+    else {
+      parent.choice ??= { kind: "feature", n: 1, options: [] };
+      parent.choice.options = [...(parent.choice.options ?? []), p.id];
+    }
+  }
+  // references must resolve
+  const ids = (list) => new Set(list.map((x) => x.id));
+  const spellIds = ids(spells), traitIds = ids(traits);
+  for (const s of subclasses) for (const x of s.spells) if (!spellIds.has(x.spell)) throw new Error(`subclass ${s.id}: unknown spell ${x.spell}`);
+  for (const r of [...races, ...subraces]) for (const t of r.traits) if (!traitIds.has(t)) throw new Error(`${r.id}: unknown trait ${t}`);
+}
+
 const schools = Object.entries(SCHOOL_RU).map(([id, name]) => ({ id, name }));
 const abilities = Object.entries(ABILITY).map(([id, [short, name]]) => ({ id, short, name }));
 
@@ -458,4 +575,4 @@ for (const [name, data] of Object.entries(out)) {
 }
 const count = (a) => (Array.isArray(a) ? a.length : Object.keys(a).length);
 console.log(Object.entries(out).map(([k, v]) => `${k}=${count(v)}`).join(" "));
-console.log(`без перевода: ${untranslated}`);
+console.log(`без перевода: ${untranslated}; записей из книг: ${bookCount}`);

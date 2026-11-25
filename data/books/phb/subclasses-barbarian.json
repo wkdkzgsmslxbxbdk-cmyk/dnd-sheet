@@ -1,0 +1,257 @@
+{
+ "subclasses": [
+  {
+   "id": "totem-warrior",
+   "class": "barbarian",
+   "name": "Путь тотемного воина",
+   "en": "Path of the Totem Warrior",
+   "flavor": "Путь дикости",
+   "page": 51,
+   "desc": [
+    "Духовный путь: дух зверя становится наставником и защитником варвара и наполняет его ярость магической силой."
+   ],
+   "spells": [],
+   "spellMode": "always",
+   "features": [
+    {
+     "id": "totem-warrior-spirit-seeker",
+     "level": 3,
+     "name": "Искатель духов",
+     "en": "Spirit Seeker",
+     "page": 51,
+     "desc": [
+      "Вы можете накладывать заклинания «Животные чувства» и «Разговор с животными», но только как ритуалы."
+     ],
+     "effects": [
+      {
+       "k": "spells",
+       "spells": [
+        {
+         "spell": "beast-sense",
+         "level": 3
+        },
+        {
+         "spell": "speak-with-animals",
+         "level": 3
+        }
+       ],
+       "note": "только как ритуалы",
+       "uses": "ritual"
+      }
+     ]
+    },
+    {
+     "id": "totem-warrior-totem-spirit",
+     "level": 3,
+     "name": "Тотемный дух",
+     "en": "Totem Spirit",
+     "page": 51,
+     "desc": [
+      "Вы выбираете тотемного духа и получаете его умение. Нужен тотем — предмет с частями животного (мех, перья, когти, зубы, кости). Животное может быть местным аналогом перечисленных: например, ястреб или гриф вместо орла."
+     ],
+     "choice": {
+      "kind": "feature",
+      "n": {
+       "3": 1
+      },
+      "options": []
+     }
+    },
+    {
+     "id": "totem-warrior-aspect-of-the-beast",
+     "level": 6,
+     "name": "Аспект зверя",
+     "en": "Aspect of the Beast",
+     "page": 51,
+     "desc": [
+      "Вы получаете магическое свойство по выбранному животному. Можно взять того же зверя, что на 3 уровне, или другого."
+     ],
+     "choice": {
+      "kind": "feature",
+      "n": {
+       "6": 1
+      },
+      "options": []
+     }
+    },
+    {
+     "id": "totem-warrior-spirit-walker",
+     "level": 10,
+     "name": "Гуляющий с духами",
+     "en": "Spirit Walker",
+     "page": 51,
+     "desc": [
+      "Вы можете накладывать «Общение с природой» как ритуал. При этом вам является призрачный образ одного из ваших тотемных животных и сообщает сведения."
+     ],
+     "effects": [
+      {
+       "k": "spells",
+       "spells": [
+        {
+         "spell": "commune-with-nature",
+         "level": 10
+        }
+       ],
+       "note": "только как ритуал",
+       "uses": "ritual"
+      }
+     ]
+    },
+    {
+     "id": "totem-warrior-totemic-attunement",
+     "level": 14,
+     "name": "Гармония тотема",
+     "en": "Totemic Attunement",
+     "page": 51,
+     "desc": [
+      "Вы получаете магическое свойство по выбранному животному. Можно взять того же зверя, что раньше, или другого."
+     ],
+     "choice": {
+      "kind": "feature",
+      "n": {
+       "14": 1
+      },
+      "options": []
+     }
+    }
+   ]
+  }
+ ],
+ "features": [
+  {
+   "id": "totem-warrior-totem-spirit-bear",
+   "class": "barbarian",
+   "subclass": "totem-warrior",
+   "level": 3,
+   "name": "Медведь",
+   "en": "Bear",
+   "page": 51,
+   "desc": [
+    "Пока вы в ярости, вы сопротивляетесь любому урону, кроме урона психической энергией."
+   ],
+   "addTo": [
+    "totem-warrior-totem-spirit"
+   ]
+  },
+  {
+   "id": "totem-warrior-totem-spirit-eagle",
+   "class": "barbarian",
+   "subclass": "totem-warrior",
+   "level": 3,
+   "name": "Орёл",
+   "en": "Eagle",
+   "page": 51,
+   "desc": [
+    "Пока вы в ярости и без тяжёлых доспехов, провоцированные атаки по вам совершаются с помехой, а Рывок вы можете делать бонусным действием."
+   ],
+   "addTo": [
+    "totem-warrior-totem-spirit"
+   ]
+  },
+  {
+   "id": "totem-warrior-totem-spirit-wolf",
+   "class": "barbarian",
+   "subclass": "totem-warrior",
+   "level": 3,
+   "name": "Волк",
+   "en": "Wolf",
+   "page": 51,
+   "desc": [
+    "Пока вы в ярости, ваши союзники совершают рукопашные атаки с преимуществом по враждебным существам в пределах 5 футов от вас."
+   ],
+   "addTo": [
+    "totem-warrior-totem-spirit"
+   ]
+  },
+  {
+   "id": "totem-warrior-aspect-of-the-beast-bear",
+   "class": "barbarian",
+   "subclass": "totem-warrior",
+   "level": 6,
+   "name": "Медведь",
+   "en": "Bear",
+   "page": 51,
+   "desc": [
+    "Ваша грузоподъёмность (максимальный груз и предел подъёма) удваивается. Проверки Силы, чтобы толкать, тянуть, поднимать или ломать предметы, вы совершаете с преимуществом."
+   ],
+   "addTo": [
+    "totem-warrior-aspect-of-the-beast"
+   ]
+  },
+  {
+   "id": "totem-warrior-aspect-of-the-beast-eagle",
+   "class": "barbarian",
+   "subclass": "totem-warrior",
+   "level": 6,
+   "name": "Орёл",
+   "en": "Eagle",
+   "page": 51,
+   "desc": [
+    "Вы ясно видите на расстояние до мили и различаете мелкие детали на дистанции до 100 футов. Тусклый свет больше не даёт помехи проверкам Мудрости (Внимательность)."
+   ],
+   "addTo": [
+    "totem-warrior-aspect-of-the-beast"
+   ]
+  },
+  {
+   "id": "totem-warrior-aspect-of-the-beast-wolf",
+   "class": "barbarian",
+   "subclass": "totem-warrior",
+   "level": 6,
+   "name": "Волк",
+   "en": "Wolf",
+   "page": 51,
+   "desc": [
+    "Вы можете выслеживать существ, двигаясь в быстром темпе, и перемещаться скрытно в нормальном темпе (см. темпы путешествия в главе 8)."
+   ],
+   "addTo": [
+    "totem-warrior-aspect-of-the-beast"
+   ]
+  },
+  {
+   "id": "totem-warrior-totemic-attunement-bear",
+   "class": "barbarian",
+   "subclass": "totem-warrior",
+   "level": 14,
+   "name": "Медведь",
+   "en": "Bear",
+   "page": 51,
+   "desc": [
+    "Пока вы в ярости, враждебные существа в пределах 5 футов от вас совершают броски атак с помехой, если цель — не вы и не другое существо с этим же свойством. Эффект не действует на тех, кто не видит или не слышит вас, а также на тех, кого нельзя напугать."
+   ],
+   "addTo": [
+    "totem-warrior-totemic-attunement"
+   ]
+  },
+  {
+   "id": "totem-warrior-totemic-attunement-eagle",
+   "class": "barbarian",
+   "subclass": "totem-warrior",
+   "level": 14,
+   "name": "Орёл",
+   "en": "Eagle",
+   "page": 51,
+   "desc": [
+    "Пока вы в ярости, у вас появляется скорость полёта, равная скорости ходьбы. Эффект временный: если ход закончится в воздухе без опоры, вы упадёте."
+   ],
+   "addTo": [
+    "totem-warrior-totemic-attunement"
+   ]
+  },
+  {
+   "id": "totem-warrior-totemic-attunement-wolf",
+   "class": "barbarian",
+   "subclass": "totem-warrior",
+   "level": 14,
+   "name": "Волк",
+   "en": "Wolf",
+   "page": 51,
+   "desc": [
+    "Пока вы в ярости, в свой ход бонусным действием вы можете сбить с ног существо размера Большой или меньше, когда попадаете по нему рукопашной атакой оружием."
+   ],
+   "addTo": [
+    "totem-warrior-totemic-attunement"
+   ]
+  }
+ ]
+}

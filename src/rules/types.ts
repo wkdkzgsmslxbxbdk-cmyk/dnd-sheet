@@ -1,11 +1,19 @@
 // Types of the generated catalog (src/data/gen/*.json, built by tools/build-data.mjs)
 
+import type { Effect } from "./effects";
+
 export type Ability = "str" | "dex" | "con" | "int" | "wis" | "cha";
 export const ABILITIES: Ability[] = ["str", "dex", "con", "int", "wis", "cha"];
 
 /** `tr: false` = no Russian translation yet, text is the English SRD original */
 interface Translated {
   tr: boolean;
+  /** "srd" or a rulebook code (phb, xge, tce, scag, eepc, vgm, mtf) */
+  source?: string;
+  /** machine-readable rules (book content); absent = text only */
+  effects?: Effect[];
+  /** "book:page" where the entry is described */
+  src?: string | null;
 }
 
 export interface SpellDamage {
@@ -43,7 +51,8 @@ export interface Spell extends Translated {
 
 export interface FeatureChoice {
   kind: "feature" | "expertise" | "enemy" | "terrain";
-  n: number;
+  /** fixed count, or by class level: {"3": 3, "7": 5} */
+  n: number | Record<string, number>;
   options?: (string | null)[];
 }
 
@@ -98,6 +107,16 @@ export interface Subclass extends Translated {
   desc: string[];
   levels: { level: number; features: string[]; cs: Record<string, any> | null }[];
   spells: { spell: string; level: number }[];
+  /** "always" = always prepared (domains, oaths); "expanded" = added to the class list (warlock patrons) */
+  spellMode?: "always" | "expanded";
+  /** subclass spellcasting (Eldritch Knight, Arcane Trickster): tables by class level */
+  casting?: {
+    ability: Ability;
+    list: string;
+    cantrips: Record<string, number>;
+    known: Record<string, number>;
+    slots: Record<string, number[]>;
+  } | null;
 }
 
 export interface Race extends Translated {
@@ -118,6 +137,7 @@ export interface Race extends Translated {
   alignment: string;
   sizeDesc: string;
   languageDesc: string;
+  desc?: string[];
 }
 
 export interface Subrace extends Translated {
@@ -130,6 +150,10 @@ export interface Subrace extends Translated {
   traits: string[];
   profs: string[];
   languageChoice: { n: number } | null;
+  /** walking speed replacing the race's (wood elf 35) */
+  speed?: number | null;
+  /** the race's ability bonuses don't apply (variant human) */
+  replaceBonuses?: boolean;
 }
 
 export interface Trait extends Translated {
@@ -162,6 +186,7 @@ export interface Feat extends Translated {
   name: string;
   en: string;
   prereq: { ability: Ability; min: number }[];
+  prereqText?: string | null;
   desc: string[];
 }
 

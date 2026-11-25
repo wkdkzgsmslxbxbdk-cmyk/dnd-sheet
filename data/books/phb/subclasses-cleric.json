@@ -1,0 +1,187 @@
+{
+  "subclasses": [
+    {
+      "id": "knowledge", "class": "cleric", "name": "Домен знаний", "en": "Knowledge Domain",
+      "flavor": "Божественный домен", "page": 62,
+      "desc": ["Боги знания ценят образование и понимание. Их жрецы собирают тайные сведения и изучают всё, до чего могут дотянуться."],
+      "spells": [
+        { "spell": "identify", "level": 1 }, { "spell": "command", "level": 1 },
+        { "spell": "suggestion", "level": 3 }, { "spell": "augury", "level": 3 },
+        { "spell": "nondetection", "level": 5 }, { "spell": "speak-with-dead", "level": 5 },
+        { "spell": "arcane-eye", "level": 7 }, { "spell": "confusion", "level": 7 },
+        { "spell": "legend-lore", "level": 9 }, { "spell": "scrying", "level": 9 }
+      ],
+      "spellMode": "always",
+      "features": [
+        { "id": "knowledge-blessings-of-knowledge", "level": 1, "name": "Благословение знаний", "en": "Blessings of Knowledge", "page": 62,
+          "desc": ["Вы выучиваете два языка на выбор и получаете владение двумя навыками из списка: История, Магия, Природа, Религия.", "Для проверок этими двумя навыками ваш бонус мастерства удваивается."],
+          "effects": [
+            { "k": "languageChoice", "n": 2 },
+            { "k": "skillChoice", "n": 2, "from": ["history", "arcana", "nature", "religion"] }
+          ] },
+        { "id": "knowledge-channel-divinity-knowledge-of-the-ages", "level": 2, "name": "Божественный канал: Знания веков", "en": "Channel Divinity: Knowledge of the Ages", "page": 62,
+          "desc": ["Действием выберите навык или инструмент: на 10 минут вы получаете владение им."] },
+        { "id": "knowledge-channel-divinity-read-thoughts", "level": 6, "name": "Божественный канал: Чтение мыслей", "en": "Channel Divinity: Read Thoughts", "page": 62,
+          "desc": ["Действием выберите видимое существо в пределах 60 футов; оно делает спасбросок МДР. При успехе вы не можете применять это умение к нему до продолжительного отдыха.", "При провале в течение 1 минуты вы читаете его поверхностные мысли, пока оно в пределах 60 футов. В это время вы можете действием закончить эффект и наложить на него «Внушение» без траты ячейки; цель автоматически проваливает спасбросок от этого заклинания."] },
+        { "id": "knowledge-potent-spellcasting", "level": 8, "name": "Могущественное колдовство", "en": "Potent Spellcasting", "page": 62,
+          "desc": ["К урону, наносимому вашими заговорами жреца, добавляется модификатор МДР."],
+          "effects": [{ "k": "cantripDamage", "value": "mod.wis", "classId": "cleric" }] },
+        { "id": "knowledge-visions-of-the-past", "level": 17, "name": "Видения прошлого", "en": "Visions of the Past", "page": 62,
+          "desc": ["Медитируя не менее 1 минуты над предметом в руках или над окружением, вы получаете смутные видения недавних событий. Медитировать можно число минут, равное значению МДР, сохраняя концентрацию как при заклинании. После применения умение восстанавливается после короткого или продолжительного отдыха.", "Чтение предмета: после 1 минуты вы узнаёте, как владелец получил и потерял предмет, и самое недавнее значимое событие с ним. Если предмет недавно (в пределах числа дней, равного значению МДР) принадлежал другому, за 1 дополнительную минуту на каждого владельца узнаёте то же о нём.", "Чтение окрестностей: вы видите недавние события в месте (комната, улица, туннель, поляна и т. п. в кубе с ребром 50 футов) за число дней, равное значению МДР. Каждая минута раскрывает одно значимое событие, начиная с последнего."],
+          "effects": [{ "k": "resource", "id": "knowledge-visions-of-the-past", "name": "Видения прошлого", "max": 1, "reset": "short" }] }
+      ]
+    },
+    {
+      "id": "light", "class": "cleric", "name": "Домен света", "en": "Light Domain",
+      "flavor": "Божественный домен", "page": 64,
+      "desc": ["Боги света олицетворяют возрождение, истину, бдительность и красоту, часто через образ солнца. Их жрецы прогоняют ложь и испепеляют тьму."],
+      "spells": [
+        { "spell": "burning-hands", "level": 1 }, { "spell": "faerie-fire", "level": 1 },
+        { "spell": "scorching-ray", "level": 3 }, { "spell": "flaming-sphere", "level": 3 },
+        { "spell": "daylight", "level": 5 }, { "spell": "fireball", "level": 5 },
+        { "spell": "wall-of-fire", "level": 7 }, { "spell": "guardian-of-faith", "level": 7 },
+        { "spell": "scrying", "level": 9 }, { "spell": "flame-strike", "level": 9 }
+      ],
+      "spellMode": "always",
+      "features": [
+        { "id": "light-bonus-cantrip", "level": 1, "name": "Дополнительный заговор", "en": "Bonus Cantrip", "page": 64,
+          "desc": ["Вы получаете заговор «Свет», если у вас его ещё нет."],
+          "effects": [{ "k": "spells", "spells": [{ "spell": "light", "level": 1 }], "ability": "wis", "note": "заговор домена Света" }] },
+        { "id": "light-warding-flare", "level": 1, "name": "Защищающая вспышка", "en": "Warding Flare", "page": 64,
+          "desc": ["Если видимое вами существо в пределах 30 футов атакует вас, вы можете реакцией наложить помеху на его бросок атаки — до того, как станет известен результат. Существа, которых нельзя ослепить, неуязвимы к этому умению.", "Число использований равно модификатору МДР (минимум 1); все восстанавливаются после продолжительного отдыха."],
+          "effects": [{ "k": "resource", "id": "light-warding-flare", "name": "Защищающая вспышка", "max": "max(1, mod.wis)", "reset": "long" }] },
+        { "id": "light-channel-divinity-radiance-of-the-dawn", "level": 2, "name": "Божественный канал: Сияние рассвета", "en": "Channel Divinity: Radiance of the Dawn", "page": 64,
+          "desc": ["Действием, показав священный символ, вы рассеиваете всю магическую тьму в пределах 30 футов. Все враждебные существа в этом радиусе делают спасбросок ТЕЛ: при провале получают урон излучением 2к10 + уровень жреца, при успехе — половину. Существа с полным укрытием от вас не затрагиваются."] },
+        { "id": "light-improved-flare", "level": 6, "name": "Улучшенная вспышка", "en": "Improved Flare", "page": 64,
+          "desc": ["Защищающую вспышку теперь можно применять и тогда, когда видимое вами существо в пределах 30 футов атакует не вас, а другое существо."] },
+        { "id": "light-potent-spellcasting", "level": 8, "name": "Могущественное колдовство", "en": "Potent Spellcasting", "page": 64,
+          "desc": ["К урону, наносимому вашими заговорами жреца, добавляется модификатор МДР."],
+          "effects": [{ "k": "cantripDamage", "value": "mod.wis", "classId": "cleric" }] },
+        { "id": "light-corona-of-light", "level": 17, "name": "Корона света", "en": "Corona of Light", "page": 64,
+          "desc": ["Действием вы создаёте ауру солнечного света на 1 минуту (или пока не рассеете её действием): яркий свет в радиусе 60 футов и тусклый ещё на 30 футов. Ваши противники на ярком свету совершают с помехой спасброски от заклинаний, причиняющих урон огнём или излучением."] }
+      ]
+    },
+    {
+      "id": "nature", "class": "cleric", "name": "Домен природы", "en": "Nature Domain",
+      "flavor": "Божественный домен", "page": 63,
+      "desc": ["Боги природы разнообразны: от лесных божеств до покровителей родников и рощ. Их жрецы охраняют угодья или карают тех, кто прогневал богов."],
+      "spells": [
+        { "spell": "animal-friendship", "level": 1 }, { "spell": "speak-with-animals", "level": 1 },
+        { "spell": "barkskin", "level": 3 }, { "spell": "spike-growth", "level": 3 },
+        { "spell": "plant-growth", "level": 5 }, { "spell": "wind-wall", "level": 5 },
+        { "spell": "dominate-beast", "level": 7 }, { "spell": "grasping-vine", "level": 7 },
+        { "spell": "tree-stride", "level": 9 }, { "spell": "insect-plague", "level": 9 }
+      ],
+      "spellMode": "always",
+      "features": [
+        { "id": "nature-acolyte-of-nature", "level": 1, "name": "Послушник природы", "en": "Acolyte of Nature", "page": 64,
+          "desc": ["Вы выучиваете один заговор друида на выбор и получаете владение одним навыком: Выживание, Природа или Уход за животными."],
+          "effects": [{ "k": "skillChoice", "n": 1, "from": ["survival", "nature", "animal-handling"] }] },
+        { "id": "nature-bonus-proficiency", "level": 1, "name": "Бонусное владение", "en": "Bonus Proficiency", "page": 64,
+          "desc": ["Вы владеете тяжёлыми доспехами."],
+          "effects": [{ "k": "prof", "ids": ["heavy-armor"] }] },
+        { "id": "nature-channel-divinity-charm-animals-and-plants", "level": 2, "name": "Божественный канал: Очарование животных и растений", "en": "Channel Divinity: Charm Animals and Plants", "page": 64,
+          "desc": ["Действием, показав священный символ и назвав божество, вы заставляете всех зверей и растительных существ, видящих вас в пределах 30 футов, делать спасбросок МДР. Проваливший становится очарован вами на 1 минуту или до получения урона, и пока очарован, дружелюбен к вам и к тем, кого вы назовёте."] },
+        { "id": "nature-dampen-elements", "level": 6, "name": "Сдерживание стихий", "en": "Dampen Elements", "page": 64,
+          "desc": ["Реакцией вы даёте сопротивление виду урона вам или существу в пределах 30 футов, когда оно получает урон звуком, кислотой, огнём, холодом или электричеством."] },
+        { "id": "nature-divine-strike", "level": 8, "name": "Божественный удар", "en": "Divine Strike", "page": 64,
+          "desc": ["Раз в свой ход, попав атакой оружием, вы можете нанести дополнительный урон 1к8 огнём, холодом или электричеством (на ваш выбор). С 14 уровня он равен 2к8."] },
+        { "id": "nature-master-of-nature", "level": 17, "name": "Мастер природы", "en": "Master of Nature", "page": 64,
+          "desc": ["Очарованным вашим каналом существам вы можете бонусным действием в свой ход вслух приказать, как поступить в их следующий ход."] }
+      ]
+    },
+    {
+      "id": "tempest", "class": "cleric", "name": "Домен бури", "en": "Tempest Domain",
+      "flavor": "Божественный домен", "page": 60,
+      "desc": ["Боги бури правят грозами, морями и небесами; среди них боги грома, землетрясений, насилия и бесстрашия. Их жрецы внушают страх либо наставляют смертных."],
+      "spells": [
+        { "spell": "thunderwave", "level": 1 }, { "spell": "fog-cloud", "level": 1 },
+        { "spell": "shatter", "level": 3 }, { "spell": "gust-of-wind", "level": 3 },
+        { "spell": "call-lightning", "level": 5 }, { "spell": "sleet-storm", "level": 5 },
+        { "spell": "control-water", "level": 7 }, { "spell": "ice-storm", "level": 7 },
+        { "spell": "destructive-wave", "level": 9 }, { "spell": "insect-plague", "level": 9 }
+      ],
+      "spellMode": "always",
+      "features": [
+        { "id": "tempest-bonus-proficiencies", "level": 1, "name": "Бонусное владение", "en": "Bonus Proficiencies", "page": 60,
+          "desc": ["Вы владеете воинским оружием и тяжёлыми доспехами."],
+          "effects": [{ "k": "prof", "ids": ["martial-weapons", "heavy-armor"] }] },
+        { "id": "tempest-wrath-of-the-storm", "level": 1, "name": "Гнев бури", "en": "Wrath of the Storm", "page": 60,
+          "desc": ["Когда видимое вами существо в пределах 5 футов попадает по вам атакой, вы можете реакцией заставить его сделать спасбросок ЛОВ. При провале оно получает 2к8 урона звуком или электричеством (на ваш выбор), при успехе — половину.", "Число использований равно модификатору МДР (минимум 1); все восстанавливаются после продолжительного отдыха."],
+          "effects": [{ "k": "resource", "id": "tempest-wrath-of-the-storm", "name": "Гнев бури", "max": "max(1, mod.wis)", "reset": "long" }] },
+        { "id": "tempest-channel-divinity-destructive-wrath", "level": 2, "name": "Божественный канал: Разрушительный гнев", "en": "Channel Divinity: Destructive Wrath", "page": 60,
+          "desc": ["Когда вы бросаете кубы урона звуком или электричеством, вы можете потратить Божественный канал и вместо броска нанести максимально возможный урон."] },
+        { "id": "tempest-thunderbolt-strike", "level": 6, "name": "Удар грома", "en": "Thunderbolt Strike", "page": 60,
+          "desc": ["Когда вы наносите урон электричеством существу размера Большой или меньше, вы можете ещё и оттолкнуть его на 10 футов от себя."] },
+        { "id": "tempest-divine-strike", "level": 8, "name": "Божественный удар", "en": "Divine Strike", "page": 61,
+          "desc": ["Раз в свой ход, попав атакой оружием, вы можете нанести цели дополнительный урон звуком 1к8. С 14 уровня он возрастает до 2к8."],
+          "effects": [{ "k": "weaponExtra", "dice": "1d8", "type": "thunder", "note": "раз в ход при попадании оружием (8 ур.)" }] },
+        { "id": "tempest-divine-strike-improved", "level": 14, "name": "Божественный удар (усиление)", "en": "Divine Strike (improved)", "page": 61,
+          "desc": ["На 14 уровне дополнительный урон Божественного удара возрастает до 2к8 (ещё 1к8 к прежнему 1к8)."],
+          "effects": [{ "k": "weaponExtra", "dice": "1d8", "type": "thunder", "note": "до 2к8 суммарно с 14 ур." }] },
+        { "id": "tempest-stormborn", "level": 17, "name": "Рождённый бурей", "en": "Stormborn", "page": 61,
+          "desc": ["Когда вы не под землёй и не в помещении, у вас есть скорость полёта, равная текущей скорости ходьбы."] }
+      ]
+    },
+    {
+      "id": "trickery", "class": "cleric", "name": "Домен обмана", "en": "Trickery Domain",
+      "flavor": "Божественный домен", "page": 63,
+      "desc": ["Боги обмана — интриганы и покровители воров, игроков и мятежников. Жрецы предпочитают уловки, проделки и воровство прямому столкновению."],
+      "spells": [
+        { "spell": "disguise-self", "level": 1 }, { "spell": "charm-person", "level": 1 },
+        { "spell": "pass-without-trace", "level": 3 }, { "spell": "mirror-image", "level": 3 },
+        { "spell": "blink", "level": 5 }, { "spell": "dispel-magic", "level": 5 },
+        { "spell": "dimension-door", "level": 7 }, { "spell": "polymorph", "level": 7 },
+        { "spell": "modify-memory", "level": 9 }, { "spell": "dominate-person", "level": 9 }
+      ],
+      "spellMode": "always",
+      "features": [
+        { "id": "trickery-blessing-of-the-trickster", "level": 1, "name": "Благословение обманщика", "en": "Blessing of the Trickster", "page": 63,
+          "desc": ["Действием вы касаетесь согласного существа (не себя): на 1 час оно совершает проверки ЛОВ (Скрытность) с преимуществом. Благословение заканчивается раньше, если вы примените это умение снова."] },
+        { "id": "trickery-channel-divinity-invoke-duplicity", "level": 2, "name": "Божественный канал: Двуличность", "en": "Channel Divinity: Invoke Duplicity", "page": 63,
+          "desc": ["Действием вы создаёте иллюзорную копию себя на 1 минуту (или пока не потеряете концентрацию, как при заклинании). Она появляется в свободном видимом пространстве в пределах 30 футов. Бонусным действием вы можете переместить её на 30 футов в видимое пространство, но не дальше 120 футов от вас.", "Пока копия существует, вы можете накладывать заклинания так, будто находитесь в её пространстве, но воспринимаете мир своими собственными чувствами. Если и вы, и копия в пределах 5 футов от существа, видящего копию, ваши броски атаки по нему совершаются с преимуществом."] },
+        { "id": "trickery-channel-divinity-cloak-of-shadows", "level": 6, "name": "Божественный канал: Плащ теней", "en": "Channel Divinity: Cloak of Shadows", "page": 63,
+          "desc": ["Действием вы становитесь невидимым до конца своего следующего хода. Невидимость заканчивается, если вы атакуете или накладываете заклинание."] },
+        { "id": "trickery-divine-strike", "level": 8, "name": "Божественный удар", "en": "Divine Strike", "page": 63,
+          "desc": ["Раз в свой ход, попав атакой оружием, вы можете нанести цели дополнительный урон ядом 1к8. С 14 уровня он возрастает до 2к8."],
+          "effects": [{ "k": "weaponExtra", "dice": "1d8", "type": "poison", "note": "раз в ход при попадании оружием (8 ур.)" }] },
+        { "id": "trickery-divine-strike-improved", "level": 14, "name": "Божественный удар (усиление)", "en": "Divine Strike (improved)", "page": 63,
+          "desc": ["На 14 уровне дополнительный урон Божественного удара возрастает до 2к8 (ещё 1к8 к прежнему 1к8)."],
+          "effects": [{ "k": "weaponExtra", "dice": "1d8", "type": "poison", "note": "до 2к8 суммарно с 14 ур." }] },
+        { "id": "trickery-improved-duplicity", "level": 17, "name": "Улучшенная двуличность", "en": "Improved Duplicity", "page": 63,
+          "desc": ["Применяя Двуличность, вы можете создать до четырёх копий вместо одной. Бонусным действием в свой ход вы можете переместить любое их число на 30 футов, не дальше 120 футов от вас."] }
+      ]
+    },
+    {
+      "id": "war", "class": "cleric", "name": "Домен войны", "en": "War Domain",
+      "flavor": "Божественный домен", "page": 61,
+      "desc": ["Боги войны следят за воинами и награждают за подвиги. Их жрецы отличаются в бою, вдохновляя союзников."],
+      "spells": [
+        { "spell": "divine-favor", "level": 1 }, { "spell": "shield-of-faith", "level": 1 },
+        { "spell": "spiritual-weapon", "level": 3 }, { "spell": "magic-weapon", "level": 3 },
+        { "spell": "spirit-guardians", "level": 5 }, { "spell": "crusaders-mantle", "level": 5 },
+        { "spell": "stoneskin", "level": 7 }, { "spell": "freedom-of-movement", "level": 7 },
+        { "spell": "flame-strike", "level": 9 }, { "spell": "hold-monster", "level": 9 }
+      ],
+      "spellMode": "always",
+      "features": [
+        { "id": "war-bonus-proficiencies", "level": 1, "name": "Бонусное владение", "en": "Bonus Proficiencies", "page": 61,
+          "desc": ["Вы владеете воинским оружием и тяжёлыми доспехами."],
+          "effects": [{ "k": "prof", "ids": ["martial-weapons", "heavy-armor"] }] },
+        { "id": "war-war-priest", "level": 1, "name": "Боевой священник", "en": "War Priest", "page": 61,
+          "desc": ["Когда вы используете действие «Атака», вы можете бонусным действием совершить одну атаку оружием.", "Число использований равно модификатору МДР (минимум 1); все восстанавливаются после продолжительного отдыха."],
+          "effects": [{ "k": "resource", "id": "war-war-priest", "name": "Боевой священник", "max": "max(1, mod.wis)", "reset": "long" }] },
+        { "id": "war-channel-divinity-guided-strike", "level": 2, "name": "Божественный канал: Направленный удар", "en": "Channel Divinity: Guided Strike", "page": 61,
+          "desc": ["Совершая бросок атаки, вы можете потратить Божественный канал и получить +10 к броску. Решение принимается после того, как вы увидели результат, но до объявления Мастером, попала ли атака."] },
+        { "id": "war-channel-divinity-war-gods-blessing", "level": 6, "name": "Божественный канал: Благословение бога войны", "en": "Channel Divinity: War God's Blessing", "page": 61,
+          "desc": ["Когда существо в пределах 30 футов совершает бросок атаки, вы можете реакцией потратить Божественный канал и дать ему +10 к броску. Решение принимается после того, как результат виден, но до объявления Мастером, попала ли атака."] },
+        { "id": "war-divine-strike", "level": 8, "name": "Божественный удар", "en": "Divine Strike", "page": 61,
+          "desc": ["Раз в свой ход, попав атакой оружием, вы можете добавить 1к8 урона, причём вид урона совпадает с видом урона вашего оружия. С 14 уровня он возрастает до 2к8."] },
+        { "id": "war-avatar-of-battle", "level": 17, "name": "Воплощение битвы", "en": "Avatar of Battle", "page": 61,
+          "desc": ["Вы получаете сопротивление дробящему, колющему и рубящему урону от немагического оружия."],
+          "effects": [{ "k": "resist", "types": ["bludgeoning", "piercing", "slashing"] }] }
+      ]
+    }
+  ]
+}
+

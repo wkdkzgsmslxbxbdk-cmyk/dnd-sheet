@@ -171,6 +171,20 @@ export function CombatTab({ c, sheet }: { c: Character; sheet: Sheet }) {
         )}
       </div>
 
+      {sheet.dcs.length > 0 && (
+        <div className="card">
+          <h2>Сл умений</h2>
+          <div className="list">
+            {sheet.dcs.map((d, i) => (
+              <div className="li" key={i}>
+                <span className="grow">{d.name} <span className="faint">{d.source}</span></span>
+                <span className="val">Сл {d.calc.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {sheet.resources.length > 0 && (
         <div className="card">
           <h2>Ресурсы</h2>
